@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="de" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RaceFlow – Nutrition & Pace Planner</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* ─── TOKENS ─────────────────────────────────────────────── */
+:root { --t:.25s; }
+[data-theme="dark"] {
+  --bg:#070b12; --surface:#0d1420; --card:#111827; --border:#1e2d42;
+  --text:#e8f0fe; --text2:#b8c8e0; --muted:#6b7d99;
+  --shadow:0 4px 24px rgba(0,0,0,.5); --grid-c:rgba(0,229,160,.025); --noise:.35;
+}
+[data-theme="light"] {
+  --bg:#eef2f9; --surface:#ffffff; --card:#ffffff; --border:#d0daea;
+  --text:#0e1724; --text2:#2c3d56; --muted:#7a8fa8;
+  --shadow:0 4px 20px rgba(15,23,40,.08); --grid-c:rgba(0,160,110,.04); --noise:.12;
+}
+:root {
+  --accent:#00c97a; --accentH:#00e5a0;
+  --orange:#ff5733; --yellow:#ffb800; --blue:#3b9eff; --red:#ff3b5c; --green:#00e5a0;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden;transition:background var(--t),color var(--t)}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.04'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:var(--noise);transition:opacity var(--t)}
+body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(var(--grid-c) 1px,transparent 1px),linear-gradient(90deg,var(--grid-c) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0;transition:var(--t)}
+.wrap{max-width:1180px;margin:0 auto;padding:0 16px;position:relative;z-index:1}
+
+/* ─── THEME BTN ─────────────────────────────────────────── */
+.thm-btn{position:fixed;top:14px;right:14px;z-index:200;width:42px;height:42px;border-radius:50%;background:var(--card);border:1px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:var(--shadow);transition:transform .2s,background var(--t),border-color var(--t)}
+.thm-btn:hover{transform:scale(1.12) rotate(18deg)}
+
+/* ─── HEADER ────────────────────────────────────────────── */
+header{padding:32px 0 0;text-align:center}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:clamp(44px,9vw,84px);letter-spacing:5px;line-height:1;background:linear-gradient(130deg,var(--accent) 0%,var(--blue) 52%,var(--accentH) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.tagline{color:var(--muted);font-size:12px;letter-spacing:3px;text-transform:uppercase;margin-top:5px}
+
+/* ─── ANIMATIONS ────────────────────────────────────────── */
+@keyframes glow{0%,100%{box-shadow:0 0 16px rgba(0,201,122,.15)}50%{box-shadow:0 0 36px rgba(0,201,122,.4)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* ─── SECTION LABEL ─────────────────────────────────────── */
+.lbl{font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:4px;color:var(--accent);text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.lbl::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--border),transparent)}
+
+/* ─── CARD ──────────────────────────────────────────────── */
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;animation:fadeUp .38s ease both;box-shadow:var(--shadow);transition:background var(--t),border-color var(--t)}
+.card+.card{margin-top:16px}
+
+/* ─── TABS ──────────────────────────────────────────────── */
+.tabs{display:flex;gap:3px;background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:4px;flex-wrap:wrap;transition:background var(--t),border-color var(--t)}
+.tab{flex:1;min-width:80px;padding:9px 5px;text-align:center;border-radius:10px;cursor:pointer;font-size:12.5px;font-weight:500;color:var(--muted);transition:all .18s;border:none;background:transparent}
+.tab.active{background:var(--card);color:var(--text);box-shadow:0 2px 8px rgba(0,0,0,.2);font-weight:600}
+
+/* ─── PILLS ─────────────────────────────────────────────── */
+.pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.pill{background:var(--surface);border:1px solid var(--border);border-radius:50px;padding:8px 18px;cursor:pointer;font-size:13px;font-weight:500;transition:all .18s;color:var(--muted)}
+.pill:hover,.pill.on{background:var(--accent);color:#000;border-color:var(--accent);font-weight:700}
+.pill.on{animation:glow 2s infinite}
+
+/* ─── INPUTS ────────────────────────────────────────────── */
+.fl{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(205px,1fr));gap:16px;margin-top:18px}
+input[type=number],input[type=text],input[type=date],select{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 14px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;outline:none;transition:border-color .18s,background var(--t)}
+input:focus,select:focus{border-color:var(--accent)}
+select option{background:var(--card)}
+input[type=range]{-webkit-appearance:none;width:100%;height:4px;background:var(--border);border-radius:2px;outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;background:var(--accent);border-radius:50%;cursor:pointer;box-shadow:0 0 8px rgba(0,201,122,.5)}
+.slb{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:4px}
+
+/* ─── BUTTONS ────────────────────────────────────────────── */
+.btn-p{width:100%;background:linear-gradient(135deg,var(--accent),#00a866);color:#000;font-family:'DM Sans',sans-serif;font-weight:700;font-size:15px;letter-spacing:1px;padding:14px;border:none;border-radius:12px;cursor:pointer;margin-top:20px;transition:all .2s;text-transform:uppercase}
+.btn-p:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,201,122,.4)}
+.btn-p:active{transform:translateY(0)}
+.btn-g{background:transparent;border:1px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;padding:9px 16px;border-radius:10px;cursor:pointer;transition:all .18s}
+.btn-g:hover{border-color:var(--accent);color:var(--accent)}
+.btn-gs{padding:6px 12px;font-size:12px;border-radius:8px}
+
+/* ─── STATS ──────────────────────────────────────────────── */
+.srow{display:grid;grid-template-columns:repeat(auto-fit,minmax(128px,1fr));gap:11px;margin-bottom:22px}
+.sc{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;text-align:center;animation:fadeUp .3s ease both;box-shadow:var(--shadow);transition:background var(--t),border-color var(--t)}
+.sv{font-family:'Bebas Neue',sans-serif;font-size:33px;letter-spacing:2px;line-height:1}
+.su{font-size:10px;color:var(--muted);letter-spacing:1px;margin-top:2px}
+.sl{font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-top:5px}
+
+/* ─── RACE TRACK ─────────────────────────────────────────── */
+.rtrack{position:relative;height:52px;background:var(--surface);border-radius:12px;overflow:hidden;margin:14px 0;border:1px solid var(--border)}
+.rtrack-fill{position:absolute;left:0;top:0;height:100%;border-radius:12px;display:flex;align-items:center;justify-content:flex-end;padding-right:12px;transition:width 1.6s cubic-bezier(.4,0,.2,1)}
+.rtrack-fill span{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:#000}
+.kmarks{display:flex;justify-content:space-between;margin-top:6px}
+.kdot{font-size:10px;color:var(--muted)}
+
+/* ─── ZONES ──────────────────────────────────────────────── */
+.zgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:11px}
+.zc{border-radius:12px;padding:16px;position:relative;overflow:hidden}
+.zc::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.ze::before{background:var(--green)} .zm::before{background:var(--yellow)} .zh::before{background:var(--orange)}
+.ze{background:rgba(0,229,160,.07);border:1px solid rgba(0,229,160,.22)}
+.zm{background:rgba(255,184,0,.07); border:1px solid rgba(255,184,0,.22)}
+.zh{background:rgba(255,87,51,.07); border:1px solid rgba(255,87,51,.22)}
+.zn{font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:2px;margin-bottom:3px}
+.zk{font-size:12px;color:var(--muted);margin-bottom:10px}
+.zp{font-family:'JetBrains Mono',monospace;font-size:26px;font-weight:600;line-height:1}
+.za{font-size:12px;color:var(--muted);margin-top:8px;line-height:1.55}
+
+/* ─── NUTRITION ──────────────────────────────────────────── */
+.ntl{position:relative;padding-left:26px}
+.ntl-line{position:absolute;left:0;top:8px;bottom:8px;width:2px;background:linear-gradient(180deg,var(--accent),var(--blue),var(--orange))}
+.ni{position:relative;margin-bottom:14px;animation:fadeUp .3s ease both}
+.ndot{position:absolute;left:-31px;top:5px;width:12px;height:12px;border-radius:50%;border:2px solid var(--accent);background:var(--bg);transition:background var(--t)}
+.ni.water .ndot{border-color:var(--blue)} .ni.gel .ndot{border-color:var(--accent)}
+.ni.electrolyte .ndot{border-color:var(--yellow)} .ni.food .ndot{border-color:var(--orange)}
+.nt{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:2px}
+.nc{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:11px 14px;transition:background var(--t),border-color var(--t)}
+.ncTitle{font-size:14px;font-weight:600;margin-bottom:2px}
+.ncd{font-size:12px;color:var(--muted);line-height:1.55}
+.nbadge{display:inline-block;padding:2px 8px;border-radius:50px;font-size:10px;font-weight:700;letter-spacing:1px;margin-left:7px;vertical-align:middle}
+.bg{background:rgba(0,229,160,.15);color:var(--green)}
+.bw{background:rgba(59,158,255,.15);color:var(--blue)}
+.be{background:rgba(255,184,0,.15);color:var(--yellow)}
+.bf{background:rgba(255,87,51,.15);color:var(--orange)}
+
+/* ─── SPLIT TABLE ────────────────────────────────────────── */
+.stbl{width:100%;border-collapse:collapse;font-size:13px}
+.stbl th{font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:2px;color:var(--muted);text-align:left;padding:8px 10px;border-bottom:1px solid var(--border)}
+.stbl td{padding:9px 10px;border-bottom:1px solid var(--border);transition:background var(--t)}
+.stbl tr:hover td{background:rgba(0,201,122,.04)}
+.stbl tr:last-child td{border-bottom:none}
+.pbar{height:3px;border-radius:2px;margin-top:4px}
+
+/* ─── COUNTDOWN ──────────────────────────────────────────── */
+.cdrow{display:flex;align-items:stretch;gap:8px;flex-wrap:wrap}
+.cdb{flex:1;min-width:68px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 8px;text-align:center;transition:background var(--t),border-color var(--t)}
+.cdn{font-family:'Bebas Neue',sans-serif;font-size:44px;letter-spacing:2px;line-height:1}
+.cdu{font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-top:3px}
+.cds{display:flex;align-items:center;font-family:'Bebas Neue',sans-serif;font-size:34px;color:var(--muted);padding-bottom:18px;animation:blink 1s infinite}
+.cdmsg{text-align:center;padding:28px;font-family:'Bebas Neue',sans-serif;font-size:38px;color:var(--accent);letter-spacing:3px}
+
+/* ─── PR TRACKER ─────────────────────────────────────────── */
+.prform{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.prform input,.prform select{flex:1;min-width:110px}
+.prtbl{width:100%;border-collapse:collapse;font-size:13px;margin-top:14px}
+.prtbl th{font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:3px;color:var(--muted);text-align:left;padding:8px 10px;border-bottom:2px solid var(--border)}
+.prtbl td{padding:10px 10px;border-bottom:1px solid var(--border);vertical-align:middle}
+.prtbl tr:last-child td{border-bottom:none}
+.prm{display:inline-block;padding:2px 9px;border-radius:50px;font-size:10px;font-weight:700}
+.gold  {background:rgba(255,184,0,.15);color:var(--yellow)}
+.silver{background:rgba(160,175,200,.15);color:#a8b8cc}
+.bronze{background:rgba(180,100,50,.15);color:#c87848}
+.prdel{background:none;border:none;color:var(--muted);cursor:pointer;padding:4px 8px;border-radius:6px;font-size:13px;transition:color .18s}
+.prdel:hover{color:var(--red)}
+.empty{text-align:center;padding:32px;color:var(--muted);font-size:13px}
+.empty big{display:block;font-size:32px;margin-bottom:8px}
+
+/* ─── HR ZONES ───────────────────────────────────────────── */
+.hrz{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border)}
+.hrz:last-child{border-bottom:none}
+.hrbg{flex:1;height:8px;background:var(--surface);border-radius:4px;overflow:hidden}
+.hrfill{height:100%;border-radius:4px}
+
+/* ─── ELEV BADGE ─────────────────────────────────────────── */
+.elvbadge{display:inline-flex;align-items:center;gap:6px;background:rgba(255,87,51,.1);border:1px solid rgba(255,87,51,.3);border-radius:8px;padding:6px 12px;font-size:12px;color:var(--orange);margin-top:10px}
+
+/* ─── TIPS ───────────────────────────────────────────────── */
+.tgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:11px}
+.tc{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;display:flex;gap:11px;align-items:flex-start;transition:background var(--t),border-color var(--t)}
+.ti{font-size:22px;flex-shrink:0}
+.tt{font-size:12.5px;color:var(--muted);line-height:1.58}
+.tt strong{color:var(--text);display:block;margin-bottom:2px;font-size:13.5px}
+
+/* ─── UTILS ──────────────────────────────────────────────── */
+.ca{color:var(--accent)} .co{color:var(--orange)} .cy{color:var(--yellow)} .cb{color:var(--blue)} .cr{color:var(--red)}
+.mt8{margin-top:8px} .mt14{margin-top:14px} .mt20{margin-top:20px}
+.gap{margin-top:28px}
+.row-end{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
+.sm{font-size:13px;color:var(--muted)}
+
+/* ─── RESPONSIVE ─────────────────────────────────────────── */
+@media(max-width:600px){
+  .logo{font-size:52px}
+  .srow{grid-template-columns:repeat(2,1fr)}
+  .tab{font-size:11px;padding:8px 3px;min-width:60px}
+  .cdrow{gap:5px}
+  .cdn{font-size:34px}
+}
+
+/* ─── PRINT ──────────────────────────────────────────────── */
+@media print{body,html{background:#fff;color:#000}.card,.sc,.nc{background:#f5f5f5;border-color:#ddd}.thm-btn,body::before,body::after{display:none}}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+</style>
+</head>
+<body>
+
+<button class="thm-btn" id="thmBtn" onclick="toggleTheme()">🌙</button>
+
+<div class="wrap">
+
+<!-- HEADER -->
+<header>
+  <div class="logo">RACEFLOW</div>
+  <p class="tagline">Nutrition &amp; Pace Planner · Race Smart · Finish Strong</p>
+</header>
+
+<!-- CONFIG -->
+<div style="margin-top:36px">
+  <div class="lbl">Race Setup</div>
+  <div class="card">
+    <div class="fl">Distanz</div>
+    <div class="pills">
+      <div class="pill on" onclick="pickRace(this,'5','5 km')">5 km</div>
+      <div class="pill" onclick="pickRace(this,'10','10 km')">10 km</div>
+      <div class="pill" onclick="pickRace(this,'21.0975','Halbmarathon')">Halbmarathon</div>
+      <div class="pill" onclick="pickRace(this,'42.195','Marathon')">Marathon</div>
+      <div class="pill" onclick="pickRace(this,'custom','Individuell')">✏️ Eigen</div>
+    </div>
+
+    <div id="ckWrap" style="display:none;margin-top:14px">
+      <div class="fl">Eigene Distanz (km)</div>
+      <input type="number" id="ckm" min="1" max="300" step="0.1" placeholder="z.B. 30">
+    </div>
+
+    <div class="grid2">
+      <div><div class="fl">Zielzeit (hh:mm)</div><input type="text" id="ttime" placeholder="z.B. 1:55" maxlength="7"></div>
+      <div><div class="fl">Fitness Level</div>
+        <select id="fit">
+          <option value="beginner">🟢 Einsteiger</option>
+          <option value="intermediate" selected>🟡 Fortgeschritten</option>
+          <option value="advanced">🔴 Ambitioniert</option>
+          <option value="elite">⚡ Elite</option>
+        </select>
+      </div>
+      <div><div class="fl">Alter (Jahre)</div><input type="number" id="age" min="10" max="90" value="30"></div>
+      <div><div class="fl">Gewicht (kg)</div><input type="number" id="wt" min="40" max="150" value="70"></div>
+      <div>
+        <div class="fl">Temperatur (°C)</div>
+        <div style="margin-top:6px">
+          <input type="range" id="tmpSlider" min="0" max="38" value="15" oninput="document.getElementById('tmpVal').textContent=this.value+'°C'">
+          <div class="slb"><span>0°C</span><span id="tmpVal">15°C</span><span>38°C</span></div>
+        </div>
+      </div>
+      <div><div class="fl">Höhenmeter gesamt (m)</div><input type="number" id="elev" min="0" max="5000" value="0" placeholder="0"></div>
+      <div><div class="fl">🏁 Renntag (optional)</div><input type="date" id="rdate"></div>
+    </div>
+
+    <button class="btn-p" onclick="calc()">⚡ PLAN BERECHNEN</button>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<div id="results" style="display:none">
+
+  <!-- STATS -->
+  <div class="gap">
+    <div class="lbl">Renn-Übersicht</div>
+    <div class="srow">
+      <div class="sc" style="animation-delay:.04s"><div class="sv ca" id="s_d">—</div><div class="su">KM</div><div class="sl">Distanz</div></div>
+      <div class="sc" style="animation-delay:.08s"><div class="sv cy" id="s_t">—</div><div class="su">h:mm</div><div class="sl">Zielzeit</div></div>
+      <div class="sc" style="animation-delay:.12s"><div class="sv cb" id="s_p">—</div><div class="su">min/km</div><div class="sl">Ø Pace</div></div>
+      <div class="sc" style="animation-delay:.16s"><div class="sv co" id="s_k">—</div><div class="su">kcal</div><div class="sl">Energie</div></div>
+      <div class="sc" style="animation-delay:.20s"><div class="sv ca" id="s_f">—</div><div class="su">ml</div><div class="sl">Flüssigkeit</div></div>
+      <div class="sc" style="animation-delay:.24s"><div class="sv cy" id="s_g">—</div><div class="su">×</div><div class="sl">Gels</div></div>
+    </div>
+    <div id="elvBadge"></div>
+  </div>
+
+  <!-- TABS -->
+  <div class="gap">
+    <div class="tabs">
+      <button class="tab active" onclick="stab(this,'tm')">🏁 Race Meter</button>
+      <button class="tab" onclick="stab(this,'tn')">🍌 Ernährung</button>
+      <button class="tab" onclick="stab(this,'ts')">📊 Splits</button>
+      <button class="tab" onclick="stab(this,'tc')">⏳ Countdown</button>
+      <button class="tab" onclick="stab(this,'tp')">🏆 PR-Tracker</button>
+      <button class="tab" onclick="stab(this,'tt')">💡 Tipps</button>
+    </div>
+
+    <!-- RACE METER -->
+    <div id="tm">
+      <div class="card">
+        <div class="lbl">Pace-Strategie &amp; Streckenprofil</div>
+        <p class="sm mt8" id="mDesc"></p>
+        <div class="rtrack"><div class="rtrack-fill" id="tFill" style="width:0%"><span id="tLbl">0 km</span></div></div>
+        <div class="kmarks" id="kmarks"></div>
+        <div class="zgrid mt14" id="zones"></div>
+        <div style="margin-top:22px">
+          <div class="fl">Herzfrequenz-Zonen (Tanaka-Formel, altersbasiert)</div>
+          <div id="hrz" class="mt8"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NUTRITION -->
+    <div id="tn" style="display:none">
+      <div class="card">
+        <div class="lbl">Ernährungsplan</div>
+        <p class="sm mt8" id="nDesc"></p>
+        <div class="ntl mt14" id="ntl"><div class="ntl-line"></div></div>
+      </div>
+      <div class="card">
+        <div class="lbl">Nährstoff-Summary</div>
+        <div class="srow" id="nsum"></div>
+      </div>
+    </div>
+
+    <!-- SPLITS -->
+    <div id="ts" style="display:none">
+      <div class="card">
+        <div class="lbl">km-Splits</div>
+        <p class="sm mt8"><span class="ca">■ Aufbau</span> · <span class="cy">■ Renntempo</span> · <span class="co">■ Finish</span></p>
+        <div style="overflow-x:auto;margin-top:14px">
+          <table class="stbl"><thead><tr><th>KM</th><th>Split</th><th>Gesamt</th><th>Pace</th><th>Zone</th></tr></thead><tbody id="sbody"></tbody></table>
+        </div>
+      </div>
+    </div>
+
+    <!-- COUNTDOWN -->
+    <div id="tc" style="display:none">
+      <div class="card">
+        <div class="lbl">Renntag Countdown</div>
+        <div id="cdMain" class="mt8"></div>
+      </div>
+      <div class="card" id="cdTip" style="display:none">
+        <div class="lbl">Was jetzt tun?</div>
+        <div id="cdAdv"></div>
+      </div>
+    </div>
+
+    <!-- PR TRACKER -->
+    <div id="tp" style="display:none">
+      <div class="card">
+        <div class="lbl">Persönliche Bestzeiten</div>
+        <p class="sm mt8">Ergebnisse lokal im Browser gespeichert. Automatische Bestleistungs-Erkennung.</p>
+        <div class="prform mt14">
+          <select id="prDist" onchange="togglePRcust()">
+            <option value="5">5 km</option>
+            <option value="10">10 km</option>
+            <option value="21.0975">Halbmarathon</option>
+            <option value="42.195">Marathon</option>
+            <option value="custom">Andere…</option>
+          </select>
+          <input type="number" id="prCd" placeholder="km" style="display:none;max-width:80px" step="0.1" min="1">
+          <input type="text" id="prTime" placeholder="hh:mm:ss oder mm:ss" style="max-width:140px">
+          <input type="date" id="prDate" style="max-width:160px">
+          <input type="text" id="prNote" placeholder="Notiz (optional)">
+          <button class="btn-g" onclick="addPR()" style="white-space:nowrap">+ Hinzufügen</button>
+        </div>
+        <div id="prTbl"></div>
+      </div>
+    </div>
+
+    <!-- TIPS -->
+    <div id="tt" style="display:none">
+      <div id="tipBox"></div>
+    </div>
+
+  </div><!-- /tabs -->
+
+  <div class="row-end" style="margin-top:20px;padding-bottom:48px">
+    <button class="btn-g" onclick="window.print()">📄 PDF Export</button>
+    <button class="btn-g" onclick="copyPlan()">📋 Kopieren</button>
+    <button class="btn-g" onclick="reset()">↺ Neu planen</button>
+  </div>
+
+</div><!-- /results -->
+</div><!-- /wrap -->
+
+<script>
+// ════════════════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════════════════
+const R={dist:5,name:'5 km',min:25,fit:'intermediate',age:30,wt:70,tmp:15,elev:0,rdate:null};
+let cdTmr=null;
+
+// ════════════════════════════════════════════════════════════
+// THEME
+// ════════════════════════════════════════════════════════════
+function toggleTheme(){
+  const h=document.documentElement, dark=h.getAttribute('data-theme')==='dark';
+  h.setAttribute('data-theme',dark?'light':'dark');
+  document.getElementById('thmBtn').textContent=dark?'☀️':'🌙';
+  localStorage.setItem('rf_theme',dark?'light':'dark');
+}
+(()=>{
+  const s=localStorage.getItem('rf_theme')||'dark';
+  document.documentElement.setAttribute('data-theme',s);
+  document.getElementById('thmBtn').textContent=s==='dark'?'🌙':'☀️';
+})();
+
+// ════════════════════════════════════════════════════════════
+// HELPERS
+// ════════════════════════════════════════════════════════════
+const hhmm=m=>{const h=Math.floor(m/60),mn=Math.round(m%60);return h?h+':'+String(mn).padStart(2,'0'):mn+' min'};
+const ps=p=>{const m=Math.floor(p),s=Math.round((p-m)*60);return m+':'+String(s).padStart(2,'0')};
+function parseMins(v){
+  if(!v)return null;
+  const p=v.split(':');
+  if(p.length===3)return +p[0]*60 + +p[1] + +p[2]/60;
+  if(p.length===2)return +p[0]*60 + +p[1];
+  return +v;
+}
+function pickRace(el,km,nm){
+  document.querySelectorAll('.pill').forEach(p=>p.classList.remove('on'));
+  el.classList.add('on');
+  const cw=document.getElementById('ckWrap');
+  if(km==='custom'){cw.style.display='block';R.name='Individuell';}
+  else{
+    cw.style.display='none'; R.dist=parseFloat(km); R.name=nm;
+    const sg={'5':'0:25','10':'0:52','21.0975':'1:55','42.195':'3:55'};
+    if(sg[km])document.getElementById('ttime').value=sg[km];
+  }
+}
+function stab(el,id){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  ['tm','tn','ts','tc','tp','tt'].forEach(i=>document.getElementById(i).style.display=i===id?'block':'none');
+}
+
+// ════════════════════════════════════════════════════════════
+// CALCULATE
+// ════════════════════════════════════════════════════════════
+function calc(){
+  const ck=document.getElementById('ckm').value;
+  if(R.name==='Individuell'&&ck) R.dist=parseFloat(ck);
+  if(!R.dist||R.dist<0.5){alert('Bitte Distanz eingeben.');return;}
+
+  R.fit  =document.getElementById('fit').value;
+  R.age  =parseInt(document.getElementById('age').value)||30;
+  R.wt   =parseFloat(document.getElementById('wt').value)||70;
+  R.tmp  =parseInt(document.getElementById('tmpSlider').value);
+  R.elev =parseInt(document.getElementById('elev').value)||0;
+  R.rdate=document.getElementById('rdate').value||null;
+
+  const tStr=document.getElementById('ttime').value;
+  const defPace={beginner:8,intermediate:6,advanced:5,elite:3.8}[R.fit];
+  R.min=parseMins(tStr)||R.dist*defPace;
+
+  // Elevation penalty: ~8s/km per 100m gain
+  const elevPen=(R.elev/100)*(8/60);
+  const effPace=R.min/R.dist + elevPen;
+  const adjMin =effPace*R.dist;
+
+  const kcal =Math.round(R.dist*R.wt*1.04);
+  const fluid=Math.round(R.dist*600)+(R.tmp>20?Math.round((R.tmp-20)*R.dist*80):0);
+  const gels =R.dist>=10?Math.max(0,Math.floor((R.min-30)/45)):0;
+
+  document.getElementById('s_d').textContent=R.dist%1===0?R.dist:R.dist.toFixed(1);
+  document.getElementById('s_t').textContent=Math.floor(adjMin/60)+':'+String(Math.round(adjMin%60)).padStart(2,'0');
+  document.getElementById('s_p').textContent=ps(effPace);
+  document.getElementById('s_k').textContent=kcal;
+  document.getElementById('s_f').textContent=fluid;
+  document.getElementById('s_g').textContent=gels;
+
+  const eb=document.getElementById('elvBadge');
+  eb.innerHTML=R.elev>0
+    ?`<div class="elvbadge">⛰️ +${R.elev}m → Pace-Penalty +${Math.round(elevPen*60)}s/km · Gesamtzeit +${Math.round(elevPen*R.dist)} min</div>`
+    :'';
+
+  buildMeter(effPace,adjMin);
+  buildNutri(adjMin,kcal,fluid,gels);
+  buildSplits(effPace);
+  buildCD();
+  buildPRTable();
+  buildTips();
+
+  document.getElementById('results').style.display='block';
+  setTimeout(()=>{document.getElementById('results').scrollIntoView({behavior:'smooth',block:'start'});animTrack();},100);
+}
+
+// ════════════════════════════════════════════════════════════
+// RACE METER
+// ════════════════════════════════════════════════════════════
+function getZones(avg){
+  const m={beginner:[1,1,1],intermediate:[1.03,.99,.97],advanced:[1.05,.98,.94],elite:[1.06,.97,.91]}[R.fit];
+  const t=R.dist/3;
+  return [
+    {cls:'ze',nm:'Phase 1 — Aufbau',   km:`0–${t.toFixed(1)} km`,       pace:avg*m[0],adv:'Ruhig reinkommen. Adrenalin kontrollieren. Körper wecken.'},
+    {cls:'zm',nm:'Phase 2 — Renntempo',km:`${t.toFixed(1)}–${(t*2).toFixed(1)} km`,pace:avg*m[1],adv:'Stabiles Zieltempo. Atmung regulieren. Ernährungsplan folgen.'},
+    {cls:'zh',nm:'Phase 3 — Finish',   km:`${(t*2).toFixed(1)}–${R.dist} km`,      pace:avg*m[2],adv:'Reserven abrufen. Technik fokussieren. Letztes km Vollgas.'},
+  ];
+}
+
+function buildMeter(avg){
+  const s={beginner:'Gleichmäßiges Tempo. Kein Adrenalin-Start. Erst nach km 1 in Pace kommen.',
+           intermediate:'Negativer Split: erste Hälfte 3% ruhiger, zweite Hälfte progressiv steigern.',
+           advanced:'Negativer Split mit starker Beschleunigung im letzten Viertel.',
+           elite:'Progressiver Aufbau. Letztes 10% absolute Maximalleistung.'};
+  document.getElementById('mDesc').textContent=s[R.fit];
+
+  const km=document.getElementById('kmarks'); km.innerHTML='';
+  const pts=R.dist<=5?[0,.25,.5,.75,1]:R.dist<=21.2?[0,5/R.dist,10/R.dist,15/R.dist,1]:[0,10/R.dist,21/R.dist,32/R.dist,1];
+  pts.forEach(f=>{
+    const v=f*R.dist,d=document.createElement('div'); d.className='kdot';
+    d.textContent=f===0?'Start':f===1?'Ziel 🏁':(v%1===0?v:v.toFixed(1))+' km';
+    km.appendChild(d);
+  });
+
+  document.getElementById('zones').innerHTML=getZones(avg).map(z=>`
+    <div class="zc ${z.cls}">
+      <div class="zn">${z.nm}</div><div class="zk">${z.km}</div>
+      <div class="zp">${ps(z.pace)} <small style="font-size:13px;color:var(--muted)">min/km</small></div>
+      <div class="za">${z.adv}</div>
+    </div>`).join('');
+
+  // HR zones – Tanaka formula: maxHR = 207 - 0.7×age
+  const mx=Math.round(207-0.7*R.age);
+  const hrData=[
+    {n:'Z1 Regeneration',pct:[50,60],c:'#00e5a0',d:'Warm-Up / Recovery'},
+    {n:'Z2 Grundlage',   pct:[60,70],c:'#3b9eff',d:'Fettverbrennung'},
+    {n:'Z3 Aerob',       pct:[70,80],c:'#ffb800',d:'Wettkampftempo'},
+    {n:'Z4 Schwelle',    pct:[80,90],c:'#ff7733',d:'Laktat-Schwelle'},
+    {n:'Z5 Maximal',     pct:[90,100],c:'#ff3b5c',d:'Sprint / Finish'},
+  ];
+  document.getElementById('hrz').innerHTML=
+    `<div style="font-size:12px;color:var(--muted);margin-bottom:10px">Max HF: <strong style="color:var(--text)">${mx} bpm</strong> (Tanaka, Alter ${R.age})</div>`+
+    hrData.map(h=>{
+      const lo=Math.round(mx*h.pct[0]/100),hi=Math.round(mx*h.pct[1]/100);
+      return `<div class="hrz">
+        <div style="width:115px;font-size:12px;font-weight:600">${h.n}</div>
+        <div class="hrbg"><div class="hrfill" style="width:${(h.pct[1]-h.pct[0])*2}%;background:${h.c};margin-left:${(h.pct[0]-50)*2}%"></div></div>
+        <div style="width:90px;font-size:11px;color:var(--muted);text-align:right;font-family:'JetBrains Mono',monospace">${lo}–${hi} bpm</div>
+        <div style="width:115px;font-size:11px;color:var(--muted);text-align:right">${h.d}</div>
+      </div>`;
+    }).join('');
+}
+
+function animTrack(){
+  let s=0;
+  const f=document.getElementById('tFill'),l=document.getElementById('tLbl');
+  const c=['linear-gradient(90deg,#00e5a0,#3b9eff)','linear-gradient(90deg,#3b9eff,#ffb800)','linear-gradient(90deg,#ffb800,#ff5733)'];
+  const iv=setInterval(()=>{s+=1.8;if(s>100){clearInterval(iv);return;}
+    f.style.width=s+'%'; f.style.background=c[Math.min(Math.floor(s/33.4),2)];
+    l.textContent=(Math.round(s*R.dist/100*10)/10)+' km';
+  },16);
+}
+
+// ════════════════════════════════════════════════════════════
+// NUTRITION
+// ════════════════════════════════════════════════════════════
+function buildNutri(totMin,kcal,fluid,gels){
+  const tl=document.getElementById('ntl');
+  tl.innerHTML='<div class="ntl-line"></div>';
+  const its=[];
+  its.push({t:'-60 min',type:'food',  bC:'bf',bT:'FOOD',ti:'Mahlzeit vor dem Start',    de:`KH-reich, fettarm: Haferflocken, Banane, Toast mit Honig. ~${Math.round(kcal*.15)} kcal.`});
+  its.push({t:'-15 min',type:'water', bC:'bw',bT:'H₂O', ti:'Letzte Hydrierung',         de:'300–500 ml Wasser oder Iso. Nicht übertrinken.'});
+  const wI=R.tmp>20?15:20, eI=totMin>60?30:0, gI=gels>0?Math.floor(totMin/(gels+1)):0;
+  let ti=0,gc=0;
+  while(ti<totMin-5){
+    ti+=5;
+    if(ti%wI<5) its.push({t:hhmm(ti),type:'water',bC:'bw',bT:'H₂O',ti:'Trinken',de:`${150+(R.tmp>25?60:0)} ml. Schluckweise trinken.`});
+    if(eI&&ti%eI<5&&ti>10) its.push({t:hhmm(ti),type:'electrolyte',bC:'be',bT:'ELEK',ti:'Elektrolyte',de:'Salztablette od. Elek-Drink (Na,K,Mg). Verhindert Krämpfe.'});
+    if(gI&&ti%gI<5&&ti>25&&gc<gels){gc++;its.push({t:hhmm(ti),type:'gel',bC:'bg',bT:'GEL',ti:`Energie-Gel #${gc}`,de:`~100 kcal / 25g KH. Mit 150ml Wasser. Nicht mit Iso kombinieren.`});}
+  }
+  its.push({t:'Ziel 🏁',type:'food',bC:'bf',bT:'FOOD',ti:'Post-Race Recovery',de:`Innerhalb 30 min: 20–30g Protein + KH. ~${Math.round(kcal*.2)} kcal.`});
+
+  const seen=new Set();
+  its.forEach((it,i)=>{
+    const k=it.t+it.type; if(seen.has(k))return; seen.add(k);
+    const d=document.createElement('div'); d.className=`ni ${it.type}`; d.style.animationDelay=i*.035+'s';
+    d.innerHTML=`<div class="ndot"></div><div class="nt">${it.t}</div>
+      <div class="nc"><div class="ncTitle">${it.ti} <span class="nbadge ${it.bC}">${it.bT}</span></div><div class="ncd">${it.de}</div></div>`;
+    tl.appendChild(d);
+  });
+
+  document.getElementById('nDesc').textContent=`${seen.size-2} Ereignisse · ${gels} Gels · ${Math.round(fluid/100)/10} dl Flüssigkeit · Temp ${R.tmp}°C`;
+  const carbs=Math.round(kcal*.65/4),prot=Math.round(R.wt*.2);
+  document.getElementById('nsum').innerHTML=`
+    <div class="sc"><div class="sv ca">${carbs}</div><div class="su">g</div><div class="sl">Kohlenhydrate</div></div>
+    <div class="sc"><div class="sv cb">${prot}</div><div class="su">g</div><div class="sl">Protein (Recovery)</div></div>
+    <div class="sc"><div class="sv cy">${gels*25}</div><div class="su">g KH</div><div class="sl">aus Gels</div></div>
+    <div class="sc"><div class="sv co">${Math.round(fluid/100)/10}</div><div class="su">dl</div><div class="sl">Gesamtflüssigkeit</div></div>`;
+}
+
+// ════════════════════════════════════════════════════════════
+// SPLITS
+// ════════════════════════════════════════════════════════════
+function buildSplits(avg){
+  const body=document.getElementById('sbody'); body.innerHTML='';
+  const step=R.dist<=5?.5:R.dist<=10?1:R.dist<=21.2?1:2;
+  const zs=getZones(avg),t3=R.dist/3;
+  const zC=['#00e5a0','#ffb800','#ff5733'],zN=['Aufbau','Renntempo','Finish'];
+  let el=0,km=0;
+  while(km<R.dist){
+    const nk=Math.min(km+step,R.dist),seg=nk-km,mid=(km+nk)/2;
+    const zi=mid<t3?0:mid<t3*2?1:2, pace=zs[zi].pace, st=seg*pace; el+=st;
+    const bw=Math.max(5,Math.min(100,Math.round((1-(pace-avg*.85)/((avg*1.15)-(avg*.85)))*100)));
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td style="font-family:'JetBrains Mono',monospace;font-weight:700">${nk%1===0?nk:nk.toFixed(1)}</td>
+      <td style="font-family:'JetBrains Mono',monospace">${ps(st)}</td>
+      <td style="font-family:'JetBrains Mono',monospace">${hhmm(el)}</td>
+      <td><div style="font-family:'JetBrains Mono',monospace;font-weight:600">${ps(pace)}</div><div class="pbar" style="width:${bw}%;background:${zC[zi]}"></div></td>
+      <td><span style="color:${zC[zi]};font-size:12px;font-weight:700">${zN[zi]}</span></td>`;
+    body.appendChild(tr); km=nk;
+  }
+}
+
+// ════════════════════════════════════════════════════════════
+// COUNTDOWN  — Feature 1
+// ════════════════════════════════════════════════════════════
+function buildCD(){
+  if(cdTmr)clearInterval(cdTmr);
+  const main=document.getElementById('cdMain'), tip=document.getElementById('cdTip'), adv=document.getElementById('cdAdv');
+  if(!R.rdate){main.innerHTML='<p class="sm mt8">Kein Renndatum angegeben. Trage oben ein Datum ein und berechne neu.</p>';tip.style.display='none';return;}
+  const rTs=new Date(R.rdate+'T07:00:00').getTime();
+  function tick(){
+    const diff=rTs-Date.now();
+    if(diff<=0){main.innerHTML='<div class="cdmsg">🏁 HEUTE IST DEIN RENNTAG!</div>';tip.style.display='none';clearInterval(cdTmr);return;}
+    const d=Math.floor(diff/86400000),h=Math.floor((diff%86400000)/3600000),m=Math.floor((diff%3600000)/60000),s=Math.floor((diff%60000)/1000);
+    main.innerHTML=`<div class="cdrow">
+      <div class="cdb"><div class="cdn ca">${String(d).padStart(2,'0')}</div><div class="cdu">Tage</div></div>
+      <div class="cds">:</div>
+      <div class="cdb"><div class="cdn cy">${String(h).padStart(2,'0')}</div><div class="cdu">Stunden</div></div>
+      <div class="cds">:</div>
+      <div class="cdb"><div class="cdn cb">${String(m).padStart(2,'0')}</div><div class="cdu">Minuten</div></div>
+      <div class="cds">:</div>
+      <div class="cdb"><div class="cdn co">${String(s).padStart(2,'0')}</div><div class="cdu">Sekunden</div></div>
+    </div>
+    <p class="sm" style="margin-top:12px;text-align:center">${R.name} · ${new Date(rTs).toLocaleDateString('de-DE',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}</p>`;
+
+    const al=d>=21
+      ?['🏋️ Trainingsphase – Umfang und Intervalle planmäßig fortführen.','💤 8h Schlaf pro Nacht als Priorität setzen.','🥗 Ausgewogene Ernährung, kein Kaloriendefizit.','🧘 Mobility und Dehnen nicht vergessen.']
+      :d>=7
+      ?['📉 Tapering beginnen – Umfang -40%, Intensität halten.','⚡ 1–2 kurze intensive Einheiten für HF-Aktivierung.','💧 Täglich 2–3L Wasser trinken. Hydration aufbauen.','🧴 Ausrüstung vorbereiten und final testen.']
+      :d>=2
+      ?['🍝 Carb-Loading heute & morgen: Pasta, Reis, Brot.','🏃 Nur Lockerläufe 15–20 min. Kein Kraftrauben.','🧳 Race-Bag gepackt? Startnummer, Gels, Schuhe check!','😴 Früh schlafen – Schlaf 2 Nächte davor zählt mehr.']
+      :['📍 Anreise und Parken heute noch prüfen.','⏰ Morgen früh aufstehen – mind. 3h vor Start.','🍌 Leichtes Frühstück: Banane, Toast. Nichts Neues.','🎯 Du hast trainiert – vertrau dir selbst!'];
+
+    tip.style.display='block';
+    adv.innerHTML=`<div class="tgrid">${al.map(a=>`<div class="tc"><div class="ti">${a.slice(0,2)}</div><div class="tt">${a.slice(2).trim()}</div></div>`).join('')}</div>`;
+  }
+  tick(); cdTmr=setInterval(tick,1000);
+}
+
+// ════════════════════════════════════════════════════════════
+// PR TRACKER  — Feature 2
+// ════════════════════════════════════════════════════════════
+const getPRs=()=>{try{return JSON.parse(localStorage.getItem('rf_prs')||'[]')}catch{return[]}};
+const savePRs=a=>localStorage.setItem('rf_prs',JSON.stringify(a));
+const dLabel=d=>({'5':'5 km','10':'10 km','21.0975':'Halbmarathon','42.195':'Marathon'}[String(d)])||d+' km';
+
+function togglePRcust(){
+  document.getElementById('prCd').style.display=document.getElementById('prDist').value==='custom'?'block':'none';
+}
+function addPR(){
+  const ds=document.getElementById('prDist').value, dc=document.getElementById('prCd').value;
+  const dist=ds==='custom'?parseFloat(dc):parseFloat(ds);
+  const tStr=document.getElementById('prTime').value.trim();
+  const date=document.getElementById('prDate').value;
+  const note=document.getElementById('prNote').value.trim();
+  if(!dist||!tStr){alert('Distanz und Zeit sind Pflicht.');return;}
+  const mins=parseMins(tStr);
+  if(!mins||mins<=0){alert('Ungültige Zeit. Format: mm:ss oder hh:mm oder hh:mm:ss');return;}
+  const all=getPRs();
+  all.unshift({id:Date.now(),dist,time:tStr,mins,date,note});
+  savePRs(all); buildPRTable();
+  document.getElementById('prTime').value=''; document.getElementById('prNote').value='';
+}
+function delPR(id){savePRs(getPRs().filter(p=>p.id!==id));buildPRTable();}
+
+function buildPRTable(){
+  const all=getPRs(), el=document.getElementById('prTbl');
+  if(!all.length){el.innerHTML='<div class="empty"><big>🏅</big>Noch keine Bestzeiten gespeichert.<br>Trage dein erstes Ergebnis ein!</div>';return;}
+  // Rank per distance
+  const byD={};
+  all.forEach(p=>{if(!byD[p.dist])byD[p.dist]=[];byD[p.dist].push(p);});
+  Object.values(byD).forEach(a=>a.sort((a,b)=>a.mins-b.mins));
+  const medal={};
+  all.forEach(p=>{const r=byD[p.dist].findIndex(x=>x.id===p.id);medal[p.id]=r===0?'gold':r===1?'silver':r===2?'bronze':'';});
+  const mIcon={gold:'🥇',silver:'🥈',bronze:'🥉',''  :''};
+  el.innerHTML=`<table class="prtbl">
+    <thead><tr><th>Distanz</th><th>Zeit</th><th>Pace</th><th>Datum</th><th>Notiz</th><th></th></tr></thead>
+    <tbody>${all.map(p=>`<tr>
+      <td><strong>${dLabel(p.dist)}</strong></td>
+      <td><span style="font-family:'JetBrains Mono',monospace;font-weight:700">${p.time}</span>
+          ${medal[p.id]?`<span class="prm ${medal[p.id]}" style="margin-left:6px">${mIcon[medal[p.id]]}</span>`:''}</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted)">${ps(p.mins/p.dist)}/km</td>
+      <td style="color:var(--muted);font-size:12px">${p.date?new Date(p.date).toLocaleDateString('de-DE'):'—'}</td>
+      <td style="color:var(--muted);font-size:12px">${p.note||'—'}</td>
+      <td><button class="prdel" onclick="delPR(${p.id})">✕</button></td>
+    </tr>`).join('')}</tbody>
+  </table>
+  <div style="text-align:right;margin-top:8px">
+    <button class="btn-g btn-gs" onclick="if(confirm('Alle PRs löschen?')){savePRs([]);buildPRTable()}">🗑 Alle löschen</button>
+  </div>`;
+}
+
+// ════════════════════════════════════════════════════════════
+// TIPS
+// ════════════════════════════════════════════════════════════
+function buildTips(){
+  const T=[
+    ['😴','Schlaf 2 Nächte davor','Die Rennnacht ist oft unruhig. Guter Schlaf 48h davor hat mehr Einfluss.'],
+    ['👟','No New Shoes','Niemals neue Schuhe am Renntag. Mind. 50–80 km einlaufen.'],
+    ['🎽','Outfit testen','Rennoutfit vorher tragen. Scheuerstellen und Blasen verhindern.'],
+    ['⏰','Früh aufstehen','Mind. 2,5–3 h vor Start: Mahlzeit + Verdauung + Aufwärmen.'],
+    [R.tmp>22?'🔥':'✅',R.tmp>22?'Hitze-Alarm!':'Optimale Bedingungen',R.tmp>22?`Bei ${R.tmp}°C Pace 5–10% lockern. Extra trinken. Sonnencreme!`:`${R.tmp}°C – ideal für Ausdauersport.`],
+    ['💨','Atemrhythmus','2 Schritte ein, 2 aus. Bauchatmung. Bei Seitenstechen: ausatmen wenn Gegenseite landet.'],
+    ['🧠','Mental segmentieren','Rennen in Stücke teilen. Immer nur bis zur nächsten Marke denken.'],
+    ['🤸','Aufwärmen',R.dist<=10?'10–15 min lockeres Einlaufen + Aktivierung.':'5–10 min Gehen reicht – keine Kraft verschwenden.'],
+    ['💊','Keine neuen Gels','Nur erprobte Produkte. Neue Gels können Magenprobleme verursachen.'],
+    ['📍','Richtiger Startblock','Realistisch einsortieren. Zu weit vorn = Ausweichen, zu weit hinten = frustrierend.'],
+    [R.elev>0?'⛰️':'🏁',R.elev>0?`+${R.elev}m Höhenmeter`:'Flache Strecke',R.elev>100?`Anstiege kräfteschonend, Abfahrten nutzen. Pace früh anpassen.`:'Flache Strecke – gleichmäßiges Tempo optimal ausnutzen.'],
+    ['🔋','Tapering',R.dist>=30?'Letzte 2–3 Wochen: Umfang -40%, Intensität halten. Frische Beine!':'2–3 Tage davor: leicht laufen, stretchen, viel schlafen.'],
+    ['📱','GPS kalibrieren','Uhr vor dem Start draußen 3–5 min Satelliten suchen lassen.'],
+    [R.dist>=21?'🧂':'💧',R.dist>=21?'Elektrolyte nicht vergessen':'Wasser reicht','Natrium ab 90 min wichtig. Nur-Wasser-Trinken kann zu Hyponatriämie führen.'],
+  ];
+  document.getElementById('tipBox').innerHTML=`<div class="card">
+    <div class="lbl">Race-Tipps für ${R.name}</div>
+    <div class="tgrid">${T.map((t,i)=>`<div class="tc" style="animation-delay:${i*.025}s"><div class="ti">${t[0]}</div><div class="tt"><strong>${t[1]}</strong>${t[2]}</div></div>`).join('')}</div>
+  </div>`;
+}
+
+// ════════════════════════════════════════════════════════════
+// EXPORT / RESET
+// ════════════════════════════════════════════════════════════
+function copyPlan(){
+  const txt=`RACEFLOW Rennplan\nDistanz: ${R.dist}km (${R.name})\nZielzeit: ${hhmm(R.min)}\nPace: ${ps(R.min/R.dist)}/km\nFitness: ${R.fit} | Alter: ${R.age} | Gewicht: ${R.wt}kg\nTemp: ${R.tmp}°C | Höhenmeter: ${R.elev}m${R.rdate?'\nRendtag: '+R.rdate:''}`;
+  navigator.clipboard.writeText(txt).then(()=>{const b=event.target;b.textContent='✅ Kopiert!';setTimeout(()=>b.textContent='📋 Kopieren',2000);});
+}
+function reset(){if(cdTmr)clearInterval(cdTmr);document.getElementById('results').style.display='none';window.scrollTo({top:0,behavior:'smooth'});}
+
+// ════════════════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded',()=>{
+  R.dist=5;
+  document.getElementById('ttime').value='0:25';
+  document.getElementById('tmpSlider').dispatchEvent(new Event('input'));
+  buildPRTable();
+});
+</script>
+</body>
+</html>
