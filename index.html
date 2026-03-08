@@ -244,6 +244,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
       </div>
       <div><div class="fl">Höhenmeter gesamt (m)</div><input type="number" id="elev" min="0" max="5000" value="0" placeholder="0"></div>
       <div><div class="fl">🏁 Renntag (optional)</div><input type="date" id="rdate"></div>
+      <div><div class="fl">⏰ Startuhrzeit</div><input type="time" id="stime" value="09:00"></div>
     </div>
 
     <button class="btn-p" onclick="calc()">⚡ PLAN BERECHNEN</button>
@@ -263,6 +264,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
       <div class="sc" style="animation-delay:.16s"><div class="sv co" id="s_k">—</div><div class="su">kcal</div><div class="sl">Energie</div></div>
       <div class="sc" style="animation-delay:.20s"><div class="sv ca" id="s_f">—</div><div class="su">ml</div><div class="sl">Flüssigkeit</div></div>
       <div class="sc" style="animation-delay:.24s"><div class="sv cy" id="s_g">—</div><div class="su">×</div><div class="sl">Gels</div></div>
+      <div class="sc" style="animation-delay:.28s"><div class="sv ca" id="s_st">—</div><div class="su">Uhr</div><div class="sl">Start</div></div>
+      <div class="sc" style="animation-delay:.32s"><div class="sv cb" id="s_ft">—</div><div class="su">Uhr</div><div class="sl">Ziel ca.</div></div>
     </div>
     <div id="elvBadge"></div>
   </div>
@@ -312,7 +315,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
         <div class="lbl">km-Splits</div>
         <p class="sm mt8"><span class="ca">■ Aufbau</span> · <span class="cy">■ Renntempo</span> · <span class="co">■ Finish</span></p>
         <div style="overflow-x:auto;margin-top:14px">
-          <table class="stbl"><thead><tr><th>KM</th><th>Split</th><th>Gesamt</th><th>Pace</th><th>Zone</th></tr></thead><tbody id="sbody"></tbody></table>
+        <table class="stbl"><thead><tr><th>KM</th><th>Split</th><th>Gesamt</th><th>Uhrzeit</th><th>Pace</th><th>Zone</th></tr></thead><tbody id="sbody"></tbody></table>
         </div>
       </div>
     </div>
@@ -420,6 +423,21 @@ function stab(el,id){
 }
 
 // ════════════════════════════════════════════════════════════
+// TIME HELPERS (global — used by calc + buildNutri)
+// ════════════════════════════════════════════════════════════
+function clockAt(offsetMin) {
+  const [sh, sm] = (R.stime||'09:00').split(':').map(Number);
+  const base = sh * 60 + sm;
+  const total = base + Math.round(offsetMin);
+  const h = Math.floor(((total % 1440) + 1440) % 1440 / 60);
+  const m = ((total % 1440) + 1440) % 60;
+  return String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ' Uhr';
+}
+function kmAt(racMin) {
+  return Math.min(R.dist, Math.round(racMin / (R.min / R.dist) * 10) / 10);
+}
+
+// ════════════════════════════════════════════════════════════
 // CALCULATE
 // ════════════════════════════════════════════════════════════
 function calc(){
@@ -433,6 +451,7 @@ function calc(){
   R.tmp  =parseInt(document.getElementById('tmpSlider').value);
   R.elev =parseInt(document.getElementById('elev').value)||0;
   R.rdate=document.getElementById('rdate').value||null;
+  R.stime=document.getElementById('stime').value||'09:00';
 
   const tStr=document.getElementById('ttime').value;
   const defPace={beginner:8,intermediate:6,advanced:5,elite:3.8}[R.fit];
@@ -453,6 +472,8 @@ function calc(){
   document.getElementById('s_k').textContent=kcal;
   document.getElementById('s_f').textContent=fluid;
   document.getElementById('s_g').textContent=gels;
+  document.getElementById('s_st').textContent=clockAt(0);
+  document.getElementById('s_ft').textContent=clockAt(adjMin);
 
   const eb=document.getElementById('elvBadge');
   eb.innerHTML=R.elev>0
@@ -540,32 +561,70 @@ function animTrack(){
 // ════════════════════════════════════════════════════════════
 // NUTRITION
 // ════════════════════════════════════════════════════════════
+
 function buildNutri(totMin,kcal,fluid,gels){
   const tl=document.getElementById('ntl');
   tl.innerHTML='<div class="ntl-line"></div>';
   const its=[];
-  its.push({t:'-60 min',type:'food',  bC:'bf',bT:'FOOD',ti:'Mahlzeit vor dem Start',    de:`KH-reich, fettarm: Haferflocken, Banane, Toast mit Honig. ~${Math.round(kcal*.15)} kcal.`});
-  its.push({t:'-15 min',type:'water', bC:'bw',bT:'H₂O', ti:'Letzte Hydrierung',         de:'300–500 ml Wasser oder Iso. Nicht übertrinken.'});
+
+  // Pre-race (negative offsets from start)
+  its.push({raceMin:-60, type:'food',  bC:'bf',bT:'FOOD',ti:'Mahlzeit vor dem Start',
+    de:`KH-reich, fettarm: Haferflocken, Banane, Toast mit Honig. ~${Math.round(kcal*.15)} kcal.`});
+  its.push({raceMin:-15, type:'water', bC:'bw',bT:'H₂O', ti:'Letzte Hydrierung',
+    de:'300–500 ml Wasser oder Iso-Drink. Nicht übertrinken.'});
+  its.push({raceMin:0,   type:'food',  bC:'bf',bT:'START',ti:'🏁 Start!',
+    de:`Pace: ${ps(R.min/R.dist)} min/km · Zielzeit ${hhmm(totMin)} · Bleib ruhig und starte kontrolliert.`});
+
   const wI=R.tmp>20?15:20, eI=totMin>60?30:0, gI=gels>0?Math.floor(totMin/(gels+1)):0;
-  let ti=0,gc=0;
-  while(ti<totMin-5){
+  let ti=0, gc=0;
+  while(ti < totMin-5) {
     ti+=5;
-    if(ti%wI<5) its.push({t:hhmm(ti),type:'water',bC:'bw',bT:'H₂O',ti:'Trinken',de:`${150+(R.tmp>25?60:0)} ml. Schluckweise trinken.`});
-    if(eI&&ti%eI<5&&ti>10) its.push({t:hhmm(ti),type:'electrolyte',bC:'be',bT:'ELEK',ti:'Elektrolyte',de:'Salztablette od. Elek-Drink (Na,K,Mg). Verhindert Krämpfe.'});
-    if(gI&&ti%gI<5&&ti>25&&gc<gels){gc++;its.push({t:hhmm(ti),type:'gel',bC:'bg',bT:'GEL',ti:`Energie-Gel #${gc}`,de:`~100 kcal / 25g KH. Mit 150ml Wasser. Nicht mit Iso kombinieren.`});}
+    if(ti%wI<5)
+      its.push({raceMin:ti, type:'water', bC:'bw',bT:'H₂O',
+        ti:'Trinken — Wasser', de:`${150+(R.tmp>25?60:0)} ml. Schluckweise, nicht auf einmal.`});
+    if(eI && ti%eI<5 && ti>10)
+      its.push({raceMin:ti, type:'electrolyte', bC:'be',bT:'ELEK',
+        ti:'Elektrolyte', de:'Salztablette od. Elek-Drink (Na, K, Mg). Verhindert Krämpfe.'});
+    if(gI && ti%gI<5 && ti>25 && gc<gels){
+      gc++;
+      its.push({raceMin:ti, type:'gel', bC:'bg',bT:'GEL',
+        ti:`Energie-Gel #${gc}`, de:`~100 kcal / 25g KH. Mit 150ml Wasser nehmen. Nicht mit Iso kombinieren.`});
+    }
   }
-  its.push({t:'Ziel 🏁',type:'food',bC:'bf',bT:'FOOD',ti:'Post-Race Recovery',de:`Innerhalb 30 min: 20–30g Protein + KH. ~${Math.round(kcal*.2)} kcal.`});
+  its.push({raceMin:totMin, type:'food', bC:'bf',bT:'ZIEL', ti:'🏁 Ziel erreicht!',
+    de:`Gratulation! Sofort: 300ml Wasser. Innerhalb 30 min: 20–30g Protein + KH. ~${Math.round(kcal*.2)} kcal.`});
+  its.push({raceMin:totMin+30, type:'food', bC:'bf',bT:'FOOD', ti:'Post-Race Recovery',
+    de:`Vollständige Mahlzeit: Proteinreich + KH. Beine hochlegen. Regeneration beginnt jetzt.`});
 
   const seen=new Set();
   its.forEach((it,i)=>{
-    const k=it.t+it.type; if(seen.has(k))return; seen.add(k);
-    const d=document.createElement('div'); d.className=`ni ${it.type}`; d.style.animationDelay=i*.035+'s';
-    d.innerHTML=`<div class="ndot"></div><div class="nt">${it.t}</div>
-      <div class="nc"><div class="ncTitle">${it.ti} <span class="nbadge ${it.bC}">${it.bT}</span></div><div class="ncd">${it.de}</div></div>`;
+    const k=it.raceMin+'_'+it.type; if(seen.has(k))return; seen.add(k);
+
+    // Build time display
+    const isPreRace = it.raceMin < 0;
+    const isRaceTime = it.raceMin >= 0 && it.raceMin <= totMin;
+    const clock = clockAt(it.raceMin);
+    const relLabel = it.raceMin < 0
+      ? `${Math.abs(Math.round(it.raceMin))} min vor Start`
+      : it.raceMin === 0 ? 'Startschuss'
+      : it.raceMin > totMin ? `+${Math.round(it.raceMin-totMin)} min nach Ziel`
+      : `nach ${hhmm(it.raceMin)} · km ${kmAt(it.raceMin).toFixed(1)}`;
+
+    const d=document.createElement('div');
+    d.className=`ni ${it.type}`; d.style.animationDelay=i*.03+'s';
+    d.innerHTML=`<div class="ndot"></div>
+      <div class="nt">
+        <span style="font-size:13px;font-weight:700;color:var(--text)">${clock}</span>
+        <span style="margin-left:8px;font-size:11px;color:var(--muted)">${relLabel}</span>
+      </div>
+      <div class="nc">
+        <div class="ncTitle">${it.ti} <span class="nbadge ${it.bC}">${it.bT}</span></div>
+        <div class="ncd">${it.de}</div>
+      </div>`;
     tl.appendChild(d);
   });
 
-  document.getElementById('nDesc').textContent=`${seen.size-2} Ereignisse · ${gels} Gels · ${Math.round(fluid/100)/10} dl Flüssigkeit · Temp ${R.tmp}°C`;
+  document.getElementById('nDesc').textContent=`Start: ${clockAt(0)} · Ziel ca. ${clockAt(totMin)} · ${gels} Gels · ${Math.round(fluid/100)/10} dl Flüssigkeit`;
   const carbs=Math.round(kcal*.65/4),prot=Math.round(R.wt*.2);
   document.getElementById('nsum').innerHTML=`
     <div class="sc"><div class="sv ca">${carbs}</div><div class="su">g</div><div class="sl">Kohlenhydrate</div></div>
@@ -591,6 +650,7 @@ function buildSplits(avg){
     tr.innerHTML=`<td style="font-family:'JetBrains Mono',monospace;font-weight:700">${nk%1===0?nk:nk.toFixed(1)}</td>
       <td style="font-family:'JetBrains Mono',monospace">${ps(st)}</td>
       <td style="font-family:'JetBrains Mono',monospace">${hhmm(el)}</td>
+      <td style="font-family:'JetBrains Mono',monospace;color:var(--accent)">${clockAt(el)}</td>
       <td><div style="font-family:'JetBrains Mono',monospace;font-weight:600">${ps(pace)}</div><div class="pbar" style="width:${bw}%;background:${zC[zi]}"></div></td>
       <td><span style="color:${zC[zi]};font-size:12px;font-weight:700">${zN[zi]}</span></td>`;
     body.appendChild(tr); km=nk;
