@@ -180,13 +180,68 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 .sm{font-size:13px;color:var(--muted)}
 
 /* ─── RESPONSIVE ─────────────────────────────────────────── */
-@media(max-width:600px){
-  .logo{font-size:52px}
-  .srow{grid-template-columns:repeat(2,1fr)}
-  .tab{font-size:11px;padding:8px 3px;min-width:60px}
-  .cdrow{gap:5px}
-  .cdn{font-size:34px}
-}
+/* ─── LIVE CHECKER ───────────────────────────────────────── */
+.live-status{border-radius:16px;padding:24px;text-align:center;margin-bottom:20px;transition:background .3s,border-color .3s}
+.live-status.ahead  {background:rgba(0,229,160,.1); border:2px solid rgba(0,229,160,.4)}
+.live-status.ontrack{background:rgba(59,158,255,.1); border:2px solid rgba(59,158,255,.35)}
+.live-status.behind {background:rgba(255,87,51,.1);  border:2px solid rgba(255,87,51,.4)}
+.live-status.neutral{background:var(--surface);      border:2px solid var(--border)}
+.live-icon{font-size:48px;line-height:1;margin-bottom:10px}
+.live-label{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:3px;margin-bottom:6px}
+.live-sub  {font-size:14px;color:var(--muted);line-height:1.7}
+.live-grid {display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-top:16px}
+.live-cell {background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center}
+.live-val  {font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;line-height:1}
+.live-unit {font-size:11px;color:var(--muted);letter-spacing:1px;margin-top:4px;text-transform:uppercase}
+.pace-adj  {display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 18px;margin-top:14px}
+
+/* ─── TRAINING PLAN ──────────────────────────────────────── */
+.week-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px;margin-bottom:10px;transition:background var(--t),border-color var(--t)}
+.week-hdr {display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.week-num {font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px}
+.week-type{font-size:11px;font-weight:700;letter-spacing:2px;padding:3px 10px;border-radius:50px;text-transform:uppercase}
+.wt-base  {background:rgba(0,229,160,.12);color:var(--green)}
+.wt-speed {background:rgba(59,158,255,.12);color:var(--blue)}
+.wt-race  {background:rgba(255,184,0,.12); color:var(--yellow)}
+.wt-taper {background:rgba(255,87,51,.12); color:var(--orange)}
+.wt-peak  {background:rgba(180,100,255,.12);color:#c07fff}
+.days-row {display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.day-cell {border-radius:8px;padding:6px 4px;text-align:center;font-size:11px;line-height:1.35}
+.day-name {font-weight:700;color:var(--muted);font-size:10px;letter-spacing:1px;margin-bottom:2px}
+.day-sess {font-size:11px;font-weight:600}
+.d-rest   {background:rgba(107,125,153,.07);color:var(--muted)}
+.d-easy   {background:rgba(0,229,160,.09); color:var(--green)}
+.d-tempo  {background:rgba(255,184,0,.09); color:var(--yellow)}
+.d-long   {background:rgba(59,158,255,.09);color:var(--blue)}
+.d-inter  {background:rgba(180,100,255,.09);color:#c07fff}
+.d-race   {background:rgba(255,87,51,.12); color:var(--orange);font-weight:800}
+.week-vol {font-size:12px;color:var(--muted);margin-top:8px}
+
+/* ─── CHECKLIST ──────────────────────────────────────────── */
+.cl-section{margin-bottom:20px}
+.cl-title  {font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:3px;color:var(--accent);text-transform:uppercase;margin-bottom:8px}
+.cl-item   {display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:6px;cursor:pointer;transition:all .18s;user-select:none}
+.cl-item:hover{border-color:var(--accent)}
+.cl-item.done{opacity:.5;text-decoration:line-through}
+.cl-item.done .cl-chk{background:var(--accent);border-color:var(--accent);color:#000}
+.cl-chk    {width:22px;height:22px;border:2px solid var(--border);border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px;transition:all .18s}
+.cl-text   {font-size:13px;line-height:1.4;flex:1}
+.cl-cat    {font-size:10px;font-weight:700;letter-spacing:1px;padding:2px 7px;border-radius:4px;flex-shrink:0}
+.cl-prog   {display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.cl-prog-bar{flex:1;height:8px;background:var(--border);border-radius:4px;overflow:hidden}
+.cl-prog-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--blue));border-radius:4px;transition:width .4s ease}
+
+/* ─── CADENCE WIDGET ─────────────────────────────────────── */
+.cad-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:14px}
+.cad-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center}
+.cad-val {font-family:'JetBrains Mono',monospace;font-size:32px;font-weight:700;line-height:1}
+.cad-lbl {font-size:11px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-top:4px}
+.cad-hint{font-size:11px;color:var(--muted);margin-top:4px;line-height:1.4}
+.cad-meter{height:8px;border-radius:4px;margin-top:8px;background:var(--border);overflow:hidden}
+.cad-fill {height:100%;border-radius:4px}
+
+@media(max-width:600px){.days-row{grid-template-columns:repeat(7,1fr)}.day-cell{padding:4px 2px}}
+
 
 /* ─── PRINT ──────────────────────────────────────────────── */
 @media print{body,html{background:#fff;color:#000}.card,.sc,.nc{background:#f5f5f5;border-color:#ddd}.thm-btn,body::before,body::after{display:none}}
@@ -273,11 +328,14 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
   <!-- TABS -->
   <div class="gap">
     <div class="tabs">
-      <button class="tab active" onclick="stab(this,'tm')">🏁 Race Meter</button>
+      <button class="tab active" onclick="stab(this,'tm')">🏁 Meter</button>
       <button class="tab" onclick="stab(this,'tn')">🍌 Ernährung</button>
       <button class="tab" onclick="stab(this,'ts')">📊 Splits</button>
+      <button class="tab" onclick="stab(this,'tl')">🎯 Live</button>
+      <button class="tab" onclick="stab(this,'tr')">📅 Training</button>
+      <button class="tab" onclick="stab(this,'tk')">🎒 Checkliste</button>
       <button class="tab" onclick="stab(this,'tc')">⏳ Countdown</button>
-      <button class="tab" onclick="stab(this,'tp')">🏆 PR-Tracker</button>
+      <button class="tab" onclick="stab(this,'tp')">🏆 PRs</button>
       <button class="tab" onclick="stab(this,'tt')">💡 Tipps</button>
     </div>
 
@@ -292,6 +350,15 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
         <div style="margin-top:22px">
           <div class="fl">Herzfrequenz-Zonen (Tanaka-Formel, altersbasiert)</div>
           <div id="hrz" class="mt8"></div>
+        </div>
+        <div style="margin-top:22px">
+          <div class="fl">Kadenz &amp; Schrittlänge</div>
+          <p class="sm mt8">Optimale Schrittfrequenz für dein Zieltempo basierend auf Körpergröße.</p>
+          <div style="margin-top:10px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+            <div class="fl" style="margin:0;white-space:nowrap">Körpergröße (cm):</div>
+            <input type="number" id="heightInput" min="140" max="220" value="175" style="max-width:90px" oninput="updateCadence()">
+          </div>
+          <div class="cad-grid" id="cadGrid"></div>
         </div>
       </div>
     </div>
@@ -317,6 +384,62 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
         <div style="overflow-x:auto;margin-top:14px">
         <table class="stbl"><thead><tr><th>KM</th><th>Split</th><th>Gesamt</th><th>Uhrzeit</th><th>Pace</th><th>Zone</th></tr></thead><tbody id="sbody"></tbody></table>
         </div>
+      </div>
+    </div>
+
+    <!-- LIVE RACE CHECKER -->
+    <div id="tl" style="display:none">
+      <div class="card">
+        <div class="lbl">🎯 Live Race Checker</div>
+        <p class="sm mt8">Gib deine aktuelle Position während des Rennens ein und sieh sofort ob du im Plan liegst.</p>
+        <div class="grid2" style="margin-top:16px">
+          <div><div class="fl">Aktueller km</div><input type="number" id="liveKm" min="0" max="300" step="0.1" placeholder="z.B. 10.5" oninput="liveCheck()"></div>
+          <div><div class="fl">Aktuelle Uhrzeit</div><input type="time" id="liveTime" oninput="liveCheck()"></div>
+        </div>
+        <div id="liveResult" class="mt14">
+          <div class="live-status neutral">
+            <div class="live-icon">🏃</div>
+            <div class="live-label">Warte auf Eingabe</div>
+            <div class="live-sub">Trage km und Uhrzeit ein um deinen Status zu sehen.</div>
+          </div>
+        </div>
+      </div>
+      <div class="card" id="liveDetailCard" style="display:none">
+        <div class="lbl">Anpassungsempfehlung</div>
+        <div id="liveAdvice"></div>
+      </div>
+    </div>
+
+    <!-- TRAINING PLAN -->
+    <div id="tr" style="display:none">
+      <div class="card">
+        <div class="lbl">📅 Trainingsplan</div>
+        <p class="sm mt8">Auto-generierter Wochenplan basierend auf deiner Zieldistanz und deinem Fitness-Level.</p>
+        <div class="grid2" style="margin-top:14px">
+          <div>
+            <div class="fl">Wochen bis Renntag</div>
+            <input type="number" id="trainWeeks" min="4" max="24" value="12" oninput="buildTraining()">
+          </div>
+          <div>
+            <div class="fl">Trainingsumfang aktuell (km/Woche)</div>
+            <input type="number" id="trainBase" min="0" max="150" value="30" oninput="buildTraining()">
+          </div>
+        </div>
+      </div>
+      <div id="trainingPlan" class="mt14"></div>
+    </div>
+
+    <!-- CHECKLIST -->
+    <div id="tk" style="display:none">
+      <div class="card">
+        <div class="lbl">🎒 Race-Day Checkliste</div>
+        <p class="sm mt8">Interaktive Checkliste — Fortschritt wird automatisch gespeichert.</p>
+        <div class="cl-prog mt14">
+          <div class="cl-prog-bar"><div class="cl-prog-fill" id="clProgFill" style="width:0%"></div></div>
+          <span class="sm" id="clProgTxt">0 / 0 erledigt</span>
+          <button class="btn-g btn-gs" onclick="resetChecklist()">↺ Reset</button>
+        </div>
+        <div id="checklistBox"></div>
       </div>
     </div>
 
@@ -419,7 +542,7 @@ function pickRace(el,km,nm){
 function stab(el,id){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   el.classList.add('active');
-  ['tm','tn','ts','tc','tp','tt'].forEach(i=>document.getElementById(i).style.display=i===id?'block':'none');
+  ['tm','tn','ts','tl','tr','tk','tc','tp','tt'].forEach(i=>document.getElementById(i).style.display=i===id?'block':'none');
 }
 
 // ════════════════════════════════════════════════════════════
@@ -485,6 +608,8 @@ function calc(){
   buildSplits(effPace);
   buildCD();
   buildPRTable();
+  buildTraining();
+  buildChecklist();
   buildTips();
 
   document.getElementById('results').style.display='block';
@@ -546,6 +671,7 @@ function buildMeter(avg){
         <div style="width:115px;font-size:11px;color:var(--muted);text-align:right">${h.d}</div>
       </div>`;
     }).join('');
+  updateCadence();
 }
 
 function animTrack(){
@@ -774,6 +900,377 @@ function buildTips(){
 }
 
 // ════════════════════════════════════════════════════════════
+// CADENCE CALCULATOR
+// ════════════════════════════════════════════════════════════
+function updateCadence(){
+  const el=document.getElementById('cadGrid'); if(!el)return;
+  if(!R.min||!R.dist)return;
+  const height=parseInt(document.getElementById('heightInput').value)||175;
+  const avgPace=R.min/R.dist; // min/km
+  // Speed in m/s
+  const speed=(1000/avgPace)/60;
+  // Optimal cadence: higher pace = higher cadence, base ~170 spm
+  // Rule of thumb: ~3 spm per 0.1 m/s above 2.5 m/s
+  const baseCad = 170;
+  const cadence = Math.round(baseCad + (speed - 2.5) * 12);
+  const clampedCad = Math.max(155, Math.min(200, cadence));
+  // Stride length = speed / (cadence/60) in meters
+  const strideLen = ((speed / (clampedCad/60)) * 100).toFixed(0); // cm
+  // Optimal stride for height
+  const optStride = Math.round(height * 0.48);
+  const cadPct = Math.round(((clampedCad - 155) / (200 - 155)) * 100);
+  const cadColor = clampedCad < 165 ? '#ff5733' : clampedCad <= 185 ? '#00e5a0' : '#ffb800';
+  const cadLabel = clampedCad < 165 ? 'Zu niedrig – Schritt verlängern' : clampedCad <= 185 ? 'Optimal' : 'Sehr hoch';
+
+  el.innerHTML=`
+    <div class="cad-card">
+      <div class="cad-val" style="color:${cadColor}">${clampedCad}</div>
+      <div class="cad-lbl">spm (Schritte/min)</div>
+      <div class="cad-hint" style="color:${cadColor}">${cadLabel}</div>
+      <div class="cad-meter"><div class="cad-fill" style="width:${cadPct}%;background:${cadColor}"></div></div>
+    </div>
+    <div class="cad-card">
+      <div class="cad-val ca">${strideLen}</div>
+      <div class="cad-lbl">cm Schrittlänge</div>
+      <div class="cad-hint">Optimal für ${height}cm: ~${optStride}cm</div>
+    </div>
+    <div class="cad-card">
+      <div class="cad-val cb">${(speed*3.6).toFixed(1)}</div>
+      <div class="cad-lbl">km/h Geschw.</div>
+      <div class="cad-hint">= ${ps(avgPace)} min/km Pace</div>
+    </div>
+    <div class="cad-card">
+      <div class="cad-val cy">${Math.round(clampedCad/2)}</div>
+      <div class="cad-lbl">Doppelschritte/min</div>
+      <div class="cad-hint">Metronome-Takt</div>
+    </div>`;
+}
+
+// ════════════════════════════════════════════════════════════
+// LIVE RACE CHECKER
+// ════════════════════════════════════════════════════════════
+function liveCheck(){
+  const kmInput=document.getElementById('liveKm').value;
+  const timeInput=document.getElementById('liveTime').value;
+  const res=document.getElementById('liveResult');
+  const detCard=document.getElementById('liveDetailCard');
+  const adv=document.getElementById('liveAdvice');
+
+  if(!kmInput||!timeInput||!R.min||!R.dist||!R.stime){
+    res.innerHTML='<div class="live-status neutral"><div class="live-icon">🏃</div><div class="live-label">Warte auf Eingabe</div><div class="live-sub">Trage km und Uhrzeit ein um deinen Status zu sehen.</div></div>';
+    detCard.style.display='none'; return;
+  }
+
+  const curKm=parseFloat(kmInput);
+  if(curKm<=0||curKm>R.dist){
+    res.innerHTML='<div class="live-status neutral"><div class="live-icon">❓</div><div class="live-label">Ungültiger km-Wert</div></div>';
+    detCard.style.display='none'; return;
+  }
+
+  // Planned time at curKm
+  const plannedMins=curKm*(R.min/R.dist);
+  const plannedClock=clockAt(plannedMins);
+
+  // Actual elapsed time
+  const [sh,sm]=(R.stime).split(':').map(Number);
+  const [ch,cm]=timeInput.split(':').map(Number);
+  let elapsedMins=(ch*60+cm)-(sh*60+sm);
+  if(elapsedMins<0) elapsedMins+=1440;
+
+  const deltaMins=elapsedMins-plannedMins; // positive = behind, negative = ahead
+  const deltaSec=Math.abs(Math.round(deltaMins*60));
+  const deltaStr=`${Math.floor(deltaSec/60)}:${String(deltaSec%60).padStart(2,'0')}`;
+
+  // Projected finish based on current pace
+  const curPace=curKm>0?elapsedMins/curKm:R.min/R.dist;
+  const projFinishMins=curPace*R.dist;
+  const projFinishClock=clockAt(projFinishMins);
+  const projDelta=projFinishMins-R.min;
+  const projDeltaStr=`${Math.floor(Math.abs(projDelta))}:${String(Math.round(Math.abs(projDelta)%1*60)).padStart(2,'0')}`;
+
+  // Remaining km and recommended pace
+  const remKm=R.dist-curKm;
+  const remTimePlan=R.min-plannedMins;
+  const neededPace=remKm>0?remTimePlan/remKm:R.min/R.dist;
+  const curPaceStr=ps(curPace);
+  const neededPaceStr=ps(Math.max(1,neededPace));
+
+  let cls='', icon='', label='', sub='';
+  if(Math.abs(deltaMins)<0.5){
+    cls='ontrack'; icon='🎯'; label='GENAU IM PLAN'; sub=`Pace: ${curPaceStr}/km · Geplant: ${ps(R.min/R.dist)}/km · Weiter so!`;
+  } else if(deltaMins<0){
+    cls='ahead'; icon='🚀'; label=`${deltaStr} VORAUS`;
+    sub=`Du bist ${deltaStr} min früher als geplant. Aktuelle Pace: ${curPaceStr}/km`;
+  } else {
+    cls='behind'; icon='⚠️'; label=`${deltaStr} ZURÜCK`;
+    sub=`Du bist ${deltaStr} min hinter dem Plan. Aktuelle Pace: ${curPaceStr}/km`;
+  }
+
+  res.innerHTML=`<div class="live-status ${cls}">
+    <div class="live-icon">${icon}</div>
+    <div class="live-label">${label}</div>
+    <div class="live-sub">${sub}</div>
+    <div class="live-grid">
+      <div class="live-cell"><div class="live-val ca">${ps(curPace)}</div><div class="live-unit">Aktuelle Pace</div></div>
+      <div class="live-cell"><div class="live-val cy">${ps(Math.max(1,neededPace))}</div><div class="live-unit">Pace für Zielzeit</div></div>
+      <div class="live-cell"><div class="live-val cb">${projFinishClock}</div><div class="live-unit">Hochgerechnet Ziel</div></div>
+      <div class="live-cell"><div class="live-val ${projDelta>0?'co':'ca'}">${projDelta>0?'+':'−'}${projDeltaStr}</div><div class="live-unit">vs. Zielzeit</div></div>
+    </div>
+  </div>`;
+
+  // Advice
+  detCard.style.display='block';
+  let advHtml='';
+  if(deltaMins>2){
+    const addPerKm=Math.round(deltaMins/remKm*60);
+    advHtml=`<div class="pace-adj">⚡ <strong>Aufholen:</strong> Erhöhe dein Tempo um ca. ${addPerKm}s/km auf <strong>${neededPaceStr}/km</strong> für die restlichen ${remKm.toFixed(1)} km.</div>`;
+  } else if(deltaMins<-2){
+    const savePerKm=Math.round(Math.abs(deltaMins)/remKm*60);
+    advHtml=`<div class="pace-adj">🛡️ <strong>Kontrolle halten:</strong> Du kannst ${savePerKm}s/km lockerer werden. Pace <strong>${neededPaceStr}/km</strong> reicht für die Zielzeit.</div>`;
+  } else {
+    advHtml=`<div class="pace-adj">✅ <strong>Perfekt!</strong> Aktuelle Pace <strong>${curPaceStr}/km</strong> beibehalten für die restlichen ${remKm.toFixed(1)} km.</div>`;
+  }
+  if(R.tmp>22) advHtml+=`<div class="pace-adj" style="margin-top:8px">🌡️ <strong>Hitze-Reminder:</strong> Bei ${R.tmp}°C regelmäßig trinken. An der nächsten Verpflegung nicht vergessen!</div>`;
+  adv.innerHTML=advHtml;
+}
+
+// ════════════════════════════════════════════════════════════
+// TRAINING PLAN
+// ════════════════════════════════════════════════════════════
+function buildTraining(){
+  const weeksEl=document.getElementById('trainWeeks');
+  const baseEl=document.getElementById('trainBase');
+  if(!weeksEl||!baseEl)return;
+
+  const totalWeeks=parseInt(weeksEl.value)||12;
+  const baseVol=parseInt(baseEl.value)||30;
+  const dist=R.dist||42.195;
+  const fit=R.fit||'intermediate';
+
+  // Target peak volume based on distance
+  const peakVol={
+    '5':{'beginner':30,'intermediate':50,'advanced':70,'elite':90},
+    '10':{'beginner':40,'intermediate':60,'advanced':80,'elite':110},
+    '21.0975':{'beginner':50,'intermediate':70,'advanced':90,'elite':120},
+    '42.195':{'beginner':60,'intermediate':80,'advanced':110,'elite':160},
+  };
+  const distKey=dist<=5?'5':dist<=10?'10':dist<=21.2?'21.0975':'42.195';
+  const target=peakVol[distKey][fit]||60;
+
+  const container=document.getElementById('trainingPlan');
+
+  // Phase structure
+  const taperWeeks=totalWeeks>=8?2:1;
+  const peakWeeks=totalWeeks>=10?2:1;
+  const buildWeeks=totalWeeks-taperWeeks-peakWeeks;
+  const baseWeeks=Math.floor(buildWeeks*0.4);
+  const speedWeeks=buildWeeks-baseWeeks;
+
+  const days=['Mo','Di','Mi','Do','Fr','Sa','So'];
+
+  function weekPlan(phase,vol,wkNum){
+    // Generate 7-day plan based on phase
+    const plans={
+      base:[
+        {cls:'d-easy',t:'Locker',sub:`${Math.round(vol*.12)}km`},
+        {cls:'d-rest',t:'Pause',sub:'Stretching'},
+        {cls:'d-easy',t:'Locker',sub:`${Math.round(vol*.14)}km`},
+        {cls:'d-tempo',t:'Tempo',sub:`${Math.round(vol*.12)}km`},
+        {cls:'d-rest',t:'Pause',sub:'Kraft / Yoga'},
+        {cls:'d-long',t:'Langer Lauf',sub:`${Math.round(vol*.3)}km`},
+        {cls:'d-rest',t:'Ruhe',sub:'Optional 5km'},
+      ],
+      speed:[
+        {cls:'d-easy',t:'Locker',sub:`${Math.round(vol*.1)}km`},
+        {cls:'d-inter',t:'Intervalle',sub:`${Math.round(vol*.12)}km`},
+        {cls:'d-easy',t:'Locker',sub:`${Math.round(vol*.1)}km`},
+        {cls:'d-tempo',t:'Tempolauf',sub:`${Math.round(vol*.15)}km`},
+        {cls:'d-rest',t:'Pause',sub:'Dehnen'},
+        {cls:'d-long',t:'Langer Lauf',sub:`${Math.round(vol*.32)}km`},
+        {cls:'d-rest',t:'Ruhe',sub:'Optionaler Lauf'},
+      ],
+      peak:[
+        {cls:'d-easy',t:'Locker',sub:`${Math.round(vol*.1)}km`},
+        {cls:'d-inter',t:'Intervalle',sub:`${Math.round(vol*.13)}km`},
+        {cls:'d-easy',t:'Locker',sub:`${Math.round(vol*.1)}km`},
+        {cls:'d-tempo',t:'Race-Pace',sub:`${Math.round(vol*.15)}km`},
+        {cls:'d-rest',t:'Pause',sub:'Massage/Roll'},
+        {cls:'d-long',t:'Langer Lauf',sub:`${Math.round(vol*.35)}km`},
+        {cls:'d-rest',t:'Ruhe',sub:'Optionaler Lauf'},
+      ],
+      taper:[
+        {cls:'d-easy',t:'Locker',sub:`${Math.round(vol*.12)}km`},
+        {cls:'d-rest',t:'Pause',sub:'Dehnen'},
+        {cls:'d-easy',t:'Locker',sub:`${Math.round(vol*.1)}km`},
+        {cls:'d-tempo',t:'Race-Pace',sub:`${Math.round(vol*.1)}km kurz`},
+        {cls:'d-rest',t:'Pause',sub:'Beine hochlegen'},
+        {cls:'d-easy',t:'Locker',sub:`${Math.round(vol*.08)}km`},
+        {cls:'d-rest',t:'Ruhe',sub:'Visualisierung'},
+      ],
+    };
+    const isRaceWeek=wkNum===totalWeeks;
+    if(isRaceWeek){
+      return [
+        {cls:'d-easy',t:'Locker',sub:'20 min'},
+        {cls:'d-rest',t:'Pause',sub:'Carb-Loading'},
+        {cls:'d-easy',t:'Locker',sub:'15 min'},
+        {cls:'d-rest',t:'Pause',sub:'Carb-Loading'},
+        {cls:'d-rest',t:'Ruhe',sub:'Früh schlafen'},
+        {cls:'d-rest',t:'Ruhe',sub:'Race-Bag pack'},
+        {cls:'d-race',t:'🏁 RENNEN',sub:R.name},
+      ];
+    }
+    return plans[phase];
+  }
+
+  let html='';
+  let wk=1;
+  // Progress volume linearly from base to target
+  const volStep=(target-baseVol)/Math.max(1,buildWeeks);
+
+  for(let i=0;i<totalWeeks;i++){
+    const wkNum=i+1;
+    let phase, typeLabel, typeClass, vol;
+    if(wkNum===totalWeeks){
+      phase='race'; typeLabel='Race Week'; typeClass='wt-race'; vol=Math.round(target*0.3);
+    } else if(wkNum>totalWeeks-taperWeeks-1){
+      phase='taper'; typeLabel='Tapering'; typeClass='wt-taper'; vol=Math.round(target*(0.5-0.1*(wkNum-(totalWeeks-taperWeeks-1))));
+    } else if(wkNum>baseWeeks+speedWeeks-peakWeeks){
+      phase='peak'; typeLabel='Peak'; typeClass='wt-peak'; vol=target;
+    } else if(wkNum>baseWeeks){
+      phase='speed'; typeLabel='Speedwork'; typeClass='wt-speed'; vol=Math.round(baseVol+volStep*(wkNum-1));
+    } else {
+      phase='base'; typeLabel='Grundlage'; typeClass='wt-base'; vol=Math.round(baseVol+volStep*(wkNum-1)*0.7);
+    }
+
+    const plan=weekPlan(phase,vol,wkNum);
+    const isRaceWk=wkNum===totalWeeks;
+    let daysHtml=days.map((d,di)=>{
+      const p=plan[di];
+      return `<div class="day-cell ${p.cls}">
+        <div class="day-name">${d}</div>
+        <div class="day-sess">${p.t}</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:2px">${p.sub}</div>
+      </div>`;
+    }).join('');
+
+    // Calculate target race date display
+    let dateLbl='';
+    if(R.rdate){
+      const rd=new Date(R.rdate);
+      const wd=new Date(rd); wd.setDate(wd.getDate()-(totalWeeks-wkNum)*7);
+      dateLbl=` · KW ab ${wd.toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit'})}`;
+    }
+
+    html+=`<div class="week-card">
+      <div class="week-hdr">
+        <div>
+          <div class="week-num">Woche ${wkNum} ${isRaceWk?'🏁':''}<span style="font-size:13px;color:var(--muted);font-family:'DM Sans',sans-serif;font-weight:400">${dateLbl}</span></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="week-type ${typeClass}">${typeLabel}</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--muted)">${vol} km</span>
+        </div>
+      </div>
+      <div class="days-row">${daysHtml}</div>
+    </div>`;
+  }
+
+  container.innerHTML=html;
+}
+
+// ════════════════════════════════════════════════════════════
+// RACE-DAY CHECKLIST
+// ════════════════════════════════════════════════════════════
+const CHECKLIST=[
+  {cat:'📅 Vorabend',items:[
+    'Startnummer + Sicherheitsnadeln bereitgelegt',
+    'Schuhe & Laufsocken ausgewählt und bereit',
+    'Rennoutfit (getestetes!) bereitgelegt',
+    'Gels & Verpflegung vorbereitet und eingepackt',
+    'GPS-Uhr geladen (mind. 90% Akku)',
+    'Trinkflasche / Trinkgürtel bereit',
+    'Wecker gestellt (mind. 3h vor Start)',
+    'Anreise + Parken geplant',
+    'Race-Bag gepackt: Wechselklamotten, Handtuch',
+    'Carb-Loading Abendessen: Pasta, Reis, Brot',
+    'Früh schlafen gehen (vor 22 Uhr)',
+  ]},
+  {cat:'🌅 Renntag Morgen',items:[
+    'Leichtes Frühstück: Banane, Toast, Haferflocken',
+    `300–500 ml Wasser getrunken`,
+    'Startnummer befestigt',
+    'Körper eingecremt (Nippel, Oberschenkel)',
+    'GPS-Uhr eingeschaltet + Satelliten suchen',
+    'Wetter gecheckt → Tempo ggf. angepasst',
+    `Warm-Up (${R.dist<=10?'10–15 min Einlaufen':'5–10 min Gehen/Traben'})`,
+    'Letztes Gel / Iso 15 min vor Start',
+    'Startblock korrekt eingeteilt',
+  ]},
+  {cat:'🏁 Im Rennen',items:[
+    `Phase 1 (0–${(R.dist/3).toFixed(0)}km): ruhig beginnen, Pace kontrollieren`,
+    'Regelmäßig trinken (alle 15–20 min)',
+    `Erstes Gel nach ${R.dist>=10?'30–45 min':'Ende nicht nötig'}`,
+    'Elektrolyte bei Bedarf nehmen',
+    'Negative Split: 2. Hälfte schneller',
+    'Letztes km: alles geben',
+  ]},
+  {cat:'✅ Nach dem Rennen',items:[
+    'Sofort 300–500 ml Wasser trinken',
+    'Innerhalb 30 min: Banane oder Protein-Shake',
+    'Medaille / Ergebnis fotografieren 📸',
+    `Ergebnis im PR-Tracker eintragen`,
+    'Beine hochlegen, kühlen',
+    'Vollständige Mahlzeit innerhalb 2h',
+  ]},
+];
+
+function getChecks(){ try{return JSON.parse(localStorage.getItem('rf_checks')||'{}')}catch{return{}} }
+function saveChecks(o){ localStorage.setItem('rf_checks',JSON.stringify(o)) }
+
+function buildChecklist(){
+  const checks=getChecks();
+  const box=document.getElementById('checklistBox'); if(!box)return;
+  let total=0,done=0,html='';
+  CHECKLIST.forEach(sec=>{
+    html+=`<div class="cl-section"><div class="cl-title">${sec.cat}</div>`;
+    sec.items.forEach((item,ii)=>{
+      const key=`${sec.cat}__${ii}`;
+      const isDone=!!checks[key];
+      total++; if(isDone)done++;
+      html+=`<div class="cl-item${isDone?' done':''}" onclick="toggleCheck('${key}',this)">
+        <div class="cl-chk">${isDone?'✓':''}</div>
+        <div class="cl-text">${item}</div>
+      </div>`;
+    });
+    html+='</div>';
+  });
+  box.innerHTML=html;
+  const pct=total>0?Math.round(done/total*100):0;
+  document.getElementById('clProgFill').style.width=pct+'%';
+  document.getElementById('clProgTxt').textContent=`${done} / ${total} erledigt`;
+}
+
+function toggleCheck(key,el){
+  const checks=getChecks();
+  if(checks[key]) delete checks[key]; else checks[key]=1;
+  saveChecks(checks);
+  const isDone=!!checks[key];
+  el.classList.toggle('done',isDone);
+  el.querySelector('.cl-chk').textContent=isDone?'✓':'';
+  // Update progress
+  const all=document.querySelectorAll('.cl-item'), doneCount=document.querySelectorAll('.cl-item.done').length;
+  const pct=all.length>0?Math.round(doneCount/all.length*100):0;
+  document.getElementById('clProgFill').style.width=pct+'%';
+  document.getElementById('clProgTxt').textContent=`${doneCount} / ${all.length} erledigt`;
+}
+
+function resetChecklist(){
+  if(!confirm('Alle Häkchen zurücksetzen?'))return;
+  saveChecks({}); buildChecklist();
+}
+
+// ════════════════════════════════════════════════════════════
 // EXPORT / RESET
 // ════════════════════════════════════════════════════════════
 function copyPlan(){
@@ -790,6 +1287,10 @@ document.addEventListener('DOMContentLoaded',()=>{
   document.getElementById('ttime').value='0:25';
   document.getElementById('tmpSlider').dispatchEvent(new Event('input'));
   buildPRTable();
+  buildChecklist();
+  // Pre-fill liveTime with current time
+  const now=new Date();
+  document.getElementById('liveTime').value=String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
 });
 </script>
 </body>
