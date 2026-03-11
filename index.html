@@ -232,13 +232,16 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 .cl-prog-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--blue));border-radius:4px;transition:width .4s ease}
 
 /* ─── STEPPER INPUTS ─────────────────────────────────────── */
-.step-wrap{background:var(--surface);border:1px solid var(--border);border-radius:12px;display:flex;align-items:center;overflow:hidden;transition:border-color .18s,background var(--t)}
+.step-wrap{background:var(--surface);border:1px solid var(--border);border-radius:12px;display:inline-flex;align-items:center;overflow:hidden;transition:border-color .18s;width:100%}
 .step-wrap:focus-within{border-color:var(--accent)}
-.step-btn{width:42px;height:46px;background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:color .15s,background .15s;user-select:none}
+.step-btn{flex-shrink:0;width:44px;height:52px;background:none;border:none;color:var(--muted);font-size:22px;font-weight:300;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:color .15s,background .15s;user-select:none;-webkit-user-select:none}
 .step-btn:hover{color:var(--accent);background:rgba(0,201,122,.08)}
 .step-btn:active{background:rgba(0,201,122,.16)}
-.step-val{flex:1;text-align:center;font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;color:var(--text);background:none;border:none;outline:none;padding:0 4px;min-width:0}
-.step-unit{font-size:11px;color:var(--muted);letter-spacing:1px;padding-right:12px;white-space:nowrap}
+.step-center{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 4px;border-left:1px solid var(--border);border-right:1px solid var(--border);min-width:0}
+.step-val{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;color:var(--text);width:100%;text-align:center;background:none;border:none;outline:none;padding:0;line-height:1}
+.step-val::-webkit-inner-spin-button,.step-val::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.step-val[type=number]{-moz-appearance:textfield}
+.step-unit{font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-top:3px}
 
 /* ─── TIME STEPPER ───────────────────────────────────────── */
 .time-wrap{background:var(--surface);border:1px solid var(--border);border-radius:12px;display:flex;align-items:stretch;transition:border-color .18s}
@@ -290,9 +293,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 .mobile-mode .tagline{font-size:10px}
 
 /* Mobile step buttons — bigger touch targets */
-.mobile-mode .step-btn{width:52px;height:52px;font-size:24px}
-.mobile-mode .step-val{font-size:22px}
-.mobile-mode .step-unit{font-size:13px;padding-right:8px}
 .mobile-mode .step-wrap{border-radius:14px}
 .mobile-mode .time-arr{font-size:18px;padding:4px 14px}
 .mobile-mode .time-num{font-size:28px;width:48px}
@@ -375,8 +375,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
   .cdn{font-size:28px}
   .grid2{grid-template-columns:1fr}
   .time-num{font-size:18px;width:32px}
-  .step-val{font-size:16px}
-  .step-btn{width:36px;height:42px;font-size:18px}
+  .step-val{font-size:22px}
   .days-row{grid-template-columns:repeat(7,1fr)}
   .day-cell{padding:3px 1px;font-size:9px}
   .day-name{font-size:8px}
@@ -615,8 +614,10 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
         <div class="fl">🎂 Alter</div>
         <div class="step-wrap">
           <button class="step-btn" onclick="stepVal('age',-1)">−</button>
-          <input class="step-val" id="age" type="number" min="10" max="90" value="30" oninput="clampStep('age',10,90);markUnsaved()">
-          <span class="step-unit">Jahre</span>
+          <div class="step-center">
+            <input class="step-val" id="age" type="number" min="10" max="90" value="30" oninput="clampStep('age',10,90);markUnsaved()">
+            <span class="step-unit">Jahre</span>
+          </div>
           <button class="step-btn" onclick="stepVal('age',1)">+</button>
         </div>
         <div class="inp-hint" id="ageHint"></div>
@@ -627,8 +628,10 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
         <div class="fl">⚖️ Gewicht</div>
         <div class="step-wrap">
           <button class="step-btn" onclick="stepVal('wt',-0.5)">−</button>
-          <input class="step-val" id="wt" type="number" min="30" max="200" step="0.5" value="70" oninput="clampStep('wt',30,200);markUnsaved()">
-          <span class="step-unit">kg</span>
+          <div class="step-center">
+            <input class="step-val" id="wt" type="number" min="30" max="200" step="0.5" value="70" oninput="clampStep('wt',30,200);markUnsaved()">
+            <span class="step-unit">kg</span>
+          </div>
           <button class="step-btn" onclick="stepVal('wt',0.5)">+</button>
         </div>
         <div class="inp-hint" id="wtHint"></div>
@@ -654,8 +657,10 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
         <div class="fl">⛰ Höhenmeter</div>
         <div class="step-wrap">
           <button class="step-btn" onclick="stepVal('elev',-50)">−</button>
-          <input class="step-val" id="elev" type="number" min="0" max="5000" step="50" value="0" oninput="clampStep('elev',0,5000)">
-          <span class="step-unit">m</span>
+          <div class="step-center">
+            <input class="step-val" id="elev" type="number" min="0" max="5000" step="50" value="0" oninput="clampStep('elev',0,5000)">
+            <span class="step-unit">m Höhe</span>
+          </div>
           <button class="step-btn" onclick="stepVal('elev',50)">+</button>
         </div>
         <div class="inp-hint" id="elevHint">Kein Höhenprofil – flache Strecke.</div>
