@@ -241,15 +241,18 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 .step-unit{font-size:11px;color:var(--muted);letter-spacing:1px;padding-right:12px;white-space:nowrap}
 
 /* ─── TIME STEPPER ───────────────────────────────────────── */
-.time-wrap{background:var(--surface);border:1px solid var(--border);border-radius:12px;display:flex;align-items:center;gap:0;overflow:hidden;transition:border-color .18s}
+.time-wrap{background:var(--surface);border:1px solid var(--border);border-radius:12px;display:flex;align-items:stretch;transition:border-color .18s}
 .time-wrap:focus-within{border-color:var(--accent)}
-.time-seg{display:flex;flex-direction:column;align-items:center;flex:1;padding:6px 4px}
-.time-seg-val{display:flex;flex-direction:column;align-items:center;gap:0}
-.time-arr{background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;line-height:1;padding:2px 8px;transition:color .15s}
-.time-arr:hover{color:var(--accent)}
-.time-num{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;color:var(--text);width:40px;text-align:center;background:none;border:none;outline:none;padding:2px 0}
-.time-colon{font-family:'JetBrains Mono',monospace;font-size:24px;font-weight:700;color:var(--muted);padding:0 2px;align-self:center}
-.time-lbl{font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-top:2px}
+.time-seg{display:flex;flex-direction:column;align-items:center;flex:1;min-width:0}
+.time-seg+.time-seg{border-left:1px solid var(--border)}
+.time-arr{background:none;border:none;color:var(--muted);cursor:pointer;font-size:11px;line-height:1;padding:7px 0;width:100%;display:flex;align-items:center;justify-content:center;transition:color .15s,background .15s;user-select:none;flex-shrink:0}
+.time-arr:hover{color:var(--accent);background:rgba(0,201,122,.06)}
+.time-arr:active{background:rgba(0,201,122,.14)}
+.time-num-wrap{display:flex;flex-direction:column;align-items:center;padding:4px 2px;border-top:1px solid var(--border);border-bottom:1px solid var(--border);width:100%}
+.time-num{font-family:'JetBrains Mono',monospace;font-size:26px;font-weight:700;color:var(--text);width:100%;text-align:center;background:none;border:none;outline:none;padding:0;line-height:1.2}
+.time-num::-webkit-inner-spin-button,.time-num::-webkit-outer-spin-button{-webkit-appearance:none}
+.time-lbl{font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-top:2px;padding-bottom:3px}
+.time-colon{font-family:'JetBrains Mono',monospace;font-size:26px;font-weight:700;color:var(--border);align-self:center;padding:0 2px;flex-shrink:0;user-select:none;pointer-events:none}
 .time-preview{font-size:11px;color:var(--accent);text-align:center;margin-top:6px;font-family:'JetBrains Mono',monospace;min-height:16px}
 
 /* ─── PROFILE BANNER ─────────────────────────────────────── */
@@ -566,30 +569,30 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
         <div class="fl">⏱ Zielzeit</div>
         <div class="time-wrap" id="ttimeWrap">
           <div class="time-seg">
-            <div class="time-seg-val">
-              <button class="time-arr" onclick="stepTime('h',1)">▲</button>
+            <button class="time-arr" onclick="stepTime('h',1)">▲</button>
+            <div class="time-num-wrap">
               <input class="time-num" id="ttH" type="number" min="0" max="9" value="0" oninput="clampTime('h');previewPace()">
-              <button class="time-arr" onclick="stepTime('h',-1)">▼</button>
+              <span class="time-lbl">Std</span>
             </div>
-            <div class="time-lbl">Stunden</div>
+            <button class="time-arr" onclick="stepTime('h',-1)">▼</button>
           </div>
-          <div class="time-colon">:</div>
+          <span class="time-colon">:</span>
           <div class="time-seg">
-            <div class="time-seg-val">
-              <button class="time-arr" onclick="stepTime('m',5)">▲</button>
+            <button class="time-arr" onclick="stepTime('m',5)">▲</button>
+            <div class="time-num-wrap">
               <input class="time-num" id="ttM" type="number" min="0" max="59" value="25" oninput="clampTime('m');previewPace()">
-              <button class="time-arr" onclick="stepTime('m',-5)">▼</button>
+              <span class="time-lbl">Min</span>
             </div>
-            <div class="time-lbl">Minuten</div>
+            <button class="time-arr" onclick="stepTime('m',-5)">▼</button>
           </div>
-          <div class="time-colon" style="opacity:.3">:</div>
+          <span class="time-colon" style="opacity:.35">:</span>
           <div class="time-seg">
-            <div class="time-seg-val">
-              <button class="time-arr" onclick="stepTime('s',15)">▲</button>
+            <button class="time-arr" onclick="stepTime('s',15)">▲</button>
+            <div class="time-num-wrap">
               <input class="time-num" id="ttS" type="number" min="0" max="59" value="0" oninput="clampTime('s');previewPace()">
-              <button class="time-arr" onclick="stepTime('s',-15)">▼</button>
+              <span class="time-lbl">Sek</span>
             </div>
-            <div class="time-lbl">Sekunden</div>
+            <button class="time-arr" onclick="stepTime('s',-15)">▼</button>
           </div>
         </div>
         <div class="time-preview" id="pacePreview"></div>
@@ -670,21 +673,21 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
         <div class="fl">🕐 Startzeit</div>
         <div class="time-wrap">
           <div class="time-seg">
-            <div class="time-seg-val">
-              <button class="time-arr" onclick="stepStart('h',1)">▲</button>
+            <button class="time-arr" onclick="stepStart('h',1)">▲</button>
+            <div class="time-num-wrap">
               <input class="time-num" id="stH" type="number" min="0" max="23" value="9" oninput="clampStart();markUnsaved()">
-              <button class="time-arr" onclick="stepStart('h',-1)">▼</button>
+              <span class="time-lbl">Std</span>
             </div>
-            <div class="time-lbl">Stunde</div>
+            <button class="time-arr" onclick="stepStart('h',-1)">▼</button>
           </div>
-          <div class="time-colon">:</div>
+          <span class="time-colon">:</span>
           <div class="time-seg">
-            <div class="time-seg-val">
-              <button class="time-arr" onclick="stepStart('m',5)">▲</button>
+            <button class="time-arr" onclick="stepStart('m',5)">▲</button>
+            <div class="time-num-wrap">
               <input class="time-num" id="stM" type="number" min="0" max="59" value="0" oninput="clampStart();markUnsaved()">
-              <button class="time-arr" onclick="stepStart('m',-5)">▼</button>
+              <span class="time-lbl">Min</span>
             </div>
-            <div class="time-lbl">Minute</div>
+            <button class="time-arr" onclick="stepStart('m',-5)">▼</button>
           </div>
         </div>
         <div class="inp-hint" id="startHint">Ernährungsplan zeigt echte Uhrzeiten.</div>
