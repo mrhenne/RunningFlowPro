@@ -231,7 +231,42 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 .cl-prog-bar{flex:1;height:8px;background:var(--border);border-radius:4px;overflow:hidden}
 .cl-prog-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--blue));border-radius:4px;transition:width .4s ease}
 
-/* ─── CADENCE WIDGET ─────────────────────────────────────── */
+/* ─── STEPPER INPUTS ─────────────────────────────────────── */
+.step-wrap{background:var(--surface);border:1px solid var(--border);border-radius:12px;display:flex;align-items:center;overflow:hidden;transition:border-color .18s,background var(--t)}
+.step-wrap:focus-within{border-color:var(--accent)}
+.step-btn{width:42px;height:46px;background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:color .15s,background .15s;user-select:none}
+.step-btn:hover{color:var(--accent);background:rgba(0,201,122,.08)}
+.step-btn:active{background:rgba(0,201,122,.16)}
+.step-val{flex:1;text-align:center;font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;color:var(--text);background:none;border:none;outline:none;padding:0 4px;min-width:0}
+.step-unit{font-size:11px;color:var(--muted);letter-spacing:1px;padding-right:12px;white-space:nowrap}
+
+/* ─── TIME STEPPER ───────────────────────────────────────── */
+.time-wrap{background:var(--surface);border:1px solid var(--border);border-radius:12px;display:flex;align-items:center;gap:0;overflow:hidden;transition:border-color .18s}
+.time-wrap:focus-within{border-color:var(--accent)}
+.time-seg{display:flex;flex-direction:column;align-items:center;flex:1;padding:6px 4px}
+.time-seg-val{display:flex;flex-direction:column;align-items:center;gap:0}
+.time-arr{background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;line-height:1;padding:2px 8px;transition:color .15s}
+.time-arr:hover{color:var(--accent)}
+.time-num{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;color:var(--text);width:40px;text-align:center;background:none;border:none;outline:none;padding:2px 0}
+.time-colon{font-family:'JetBrains Mono',monospace;font-size:24px;font-weight:700;color:var(--muted);padding:0 2px;align-self:center}
+.time-lbl{font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-top:2px}
+.time-preview{font-size:11px;color:var(--accent);text-align:center;margin-top:6px;font-family:'JetBrains Mono',monospace;min-height:16px}
+
+/* ─── PROFILE BANNER ─────────────────────────────────────── */
+.profile-bar{display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(0,201,122,.07);border:1px solid rgba(0,201,122,.2);border-radius:10px;margin-bottom:16px;flex-wrap:wrap}
+.profile-bar.saved{background:rgba(59,158,255,.07);border-color:rgba(59,158,255,.2)}
+.profile-name{flex:1;font-size:13px;font-weight:600;min-width:0}
+.profile-name input{background:none;border:none;border-bottom:1px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;outline:none;width:100%;max-width:180px;padding:1px 4px}
+.profile-name input:focus{border-bottom-color:var(--accent)}
+
+/* ─── SAVE TOAST ─────────────────────────────────────────── */
+.save-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--accent);color:#000;font-weight:700;font-size:13px;letter-spacing:1px;padding:10px 24px;border-radius:50px;z-index:500;transition:transform .3s cubic-bezier(.34,1.56,.64,1),opacity .3s;opacity:0;pointer-events:none}
+.save-toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+
+/* ─── INPUT GROUP LABELS ─────────────────────────────────── */
+.inp-group{display:flex;flex-direction:column;gap:6px}
+.inp-hint{font-size:11px;color:var(--muted);margin-top:2px;line-height:1.4}
+
 .cad-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:14px}
 .cad-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center}
 .cad-val {font-family:'JetBrains Mono',monospace;font-size:32px;font-weight:700;line-height:1}
@@ -341,6 +376,9 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
   </div>
 </div>
 
+<!-- SAVE TOAST -->
+<div class="save-toast" id="saveToast">✓ Profil gespeichert</div>
+
 <div class="wrap">
 
 <!-- HEADER -->
@@ -353,6 +391,38 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 <div style="margin-top:36px">
   <div class="lbl">Race Setup</div>
   <div class="card">
+
+    <!-- PROFILE BAR -->
+    <div class="profile-bar" id="profileBar">
+      <div style="font-size:22px;flex-shrink:0">👤</div>
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <input type="text" id="profileName" placeholder="Dein Name (optional)" maxlength="40"
+            style="background:none;border:none;border-bottom:1px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;outline:none;max-width:200px;padding:2px 4px"
+            oninput="markUnsaved()" onfocus="this.style.borderBottomColor='var(--accent)'" onblur="this.style.borderBottomColor='var(--border)'">
+          <span id="profileSavedBadge" style="display:none;font-size:11px;font-weight:700;letter-spacing:1px;padding:2px 8px;border-radius:50px;background:rgba(0,201,122,.15);color:var(--accent)">✓ GESPEICHERT</span>
+          <span id="profileUnsavedBadge" style="display:none;font-size:11px;color:var(--muted)">● Nicht gespeichert</span>
+        </div>
+        <div id="profileSavedInfo" style="font-size:11px;color:var(--muted);margin-top:3px;display:none"></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;flex-shrink:0">
+        <!-- Auto-save toggle -->
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12px;color:var(--muted);white-space:nowrap">
+          <span style="position:relative;display:inline-block;width:34px;height:20px">
+            <input type="checkbox" id="autoSaveToggle" onchange="toggleAutoSave()"
+              style="opacity:0;width:0;height:0;position:absolute">
+            <span id="autoSaveTrack" style="position:absolute;inset:0;border-radius:10px;background:var(--border);transition:background .2s;cursor:pointer"
+              onclick="document.getElementById('autoSaveToggle').click()"></span>
+            <span id="autoSaveThumb" style="position:absolute;left:3px;top:3px;width:14px;height:14px;border-radius:50%;background:#fff;transition:transform .2s;pointer-events:none"></span>
+          </span>
+          Auto-Speichern
+        </label>
+        <button class="btn-g" id="saveBtn" onclick="saveProfile()" style="white-space:nowrap;flex-shrink:0">💾 Speichern</button>
+        <button class="btn-g" onclick="clearProfile()" style="color:var(--muted);flex-shrink:0;padding:9px 10px" title="Profil löschen">🗑</button>
+      </div>
+    </div>
+
+    <!-- DISTANCE -->
     <div class="fl">Distanz</div>
     <div class="pills">
       <div class="pill on" onclick="pickRace(this,'5','5 km')">5 km</div>
@@ -361,35 +431,144 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
       <div class="pill" onclick="pickRace(this,'42.195','Marathon')">Marathon</div>
       <div class="pill" onclick="pickRace(this,'custom','Individuell')">✏️ Eigen</div>
     </div>
-
     <div id="ckWrap" style="display:none;margin-top:14px">
       <div class="fl">Eigene Distanz (km)</div>
-      <input type="number" id="ckm" min="1" max="300" step="0.1" placeholder="z.B. 30">
+      <input type="number" id="ckm" min="1" max="300" step="0.1" placeholder="z.B. 30" style="max-width:160px">
     </div>
 
-    <div class="grid2">
-      <div><div class="fl">Zielzeit (hh:mm)</div><input type="text" id="ttime" placeholder="z.B. 1:55" maxlength="7"></div>
-      <div><div class="fl">Fitness Level</div>
-        <select id="fit">
+    <!-- ROW 1: Zielzeit + Fitness -->
+    <div class="grid2" style="margin-top:20px">
+
+      <!-- ZIELZEIT -->
+      <div class="inp-group">
+        <div class="fl">⏱ Zielzeit</div>
+        <div class="time-wrap" id="ttimeWrap">
+          <div class="time-seg">
+            <div class="time-seg-val">
+              <button class="time-arr" onclick="stepTime('h',1)">▲</button>
+              <input class="time-num" id="ttH" type="number" min="0" max="9" value="0" oninput="clampTime('h');previewPace()">
+              <button class="time-arr" onclick="stepTime('h',-1)">▼</button>
+            </div>
+            <div class="time-lbl">Stunden</div>
+          </div>
+          <div class="time-colon">:</div>
+          <div class="time-seg">
+            <div class="time-seg-val">
+              <button class="time-arr" onclick="stepTime('m',5)">▲</button>
+              <input class="time-num" id="ttM" type="number" min="0" max="59" value="25" oninput="clampTime('m');previewPace()">
+              <button class="time-arr" onclick="stepTime('m',-5)">▼</button>
+            </div>
+            <div class="time-lbl">Minuten</div>
+          </div>
+          <div class="time-colon" style="opacity:.3">:</div>
+          <div class="time-seg">
+            <div class="time-seg-val">
+              <button class="time-arr" onclick="stepTime('s',15)">▲</button>
+              <input class="time-num" id="ttS" type="number" min="0" max="59" value="0" oninput="clampTime('s');previewPace()">
+              <button class="time-arr" onclick="stepTime('s',-15)">▼</button>
+            </div>
+            <div class="time-lbl">Sekunden</div>
+          </div>
+        </div>
+        <div class="time-preview" id="pacePreview"></div>
+      </div>
+
+      <!-- FITNESS -->
+      <div class="inp-group">
+        <div class="fl">🏅 Fitness Level</div>
+        <select id="fit" onchange="previewPace();updateFitHint();markUnsaved()">
           <option value="beginner">🟢 Einsteiger</option>
           <option value="intermediate" selected>🟡 Fortgeschritten</option>
           <option value="advanced">🔴 Ambitioniert</option>
           <option value="elite">⚡ Elite</option>
         </select>
+        <div class="inp-hint" id="fitHint">Normales Wettkampftempo mit gleichmäßiger Paceverteilung.</div>
       </div>
-      <div><div class="fl">Alter (Jahre)</div><input type="number" id="age" min="10" max="90" value="30"></div>
-      <div><div class="fl">Gewicht (kg)</div><input type="number" id="wt" min="40" max="150" value="70"></div>
-      <div>
-        <div class="fl">Temperatur (°C)</div>
-        <div style="margin-top:6px">
-          <input type="range" id="tmpSlider" min="0" max="38" value="15" oninput="document.getElementById('tmpVal').textContent=this.value+'°C'">
-          <div class="slb"><span>0°C</span><span id="tmpVal">15°C</span><span>38°C</span></div>
+
+      <!-- ALTER -->
+      <div class="inp-group">
+        <div class="fl">🎂 Alter</div>
+        <div class="step-wrap">
+          <button class="step-btn" onclick="stepVal('age',-1)">−</button>
+          <input class="step-val" id="age" type="number" min="10" max="90" value="30" oninput="clampStep('age',10,90);markUnsaved()">
+          <span class="step-unit">Jahre</span>
+          <button class="step-btn" onclick="stepVal('age',1)">+</button>
         </div>
+        <div class="inp-hint" id="ageHint"></div>
       </div>
-      <div><div class="fl">Höhenmeter gesamt (m)</div><input type="number" id="elev" min="0" max="5000" value="0" placeholder="0"></div>
-      <div><div class="fl">🏁 Renntag (optional)</div><input type="date" id="rdate"></div>
-      <div><div class="fl">⏰ Startuhrzeit</div><input type="time" id="stime" value="09:00"></div>
-    </div>
+
+      <!-- GEWICHT -->
+      <div class="inp-group">
+        <div class="fl">⚖️ Gewicht</div>
+        <div class="step-wrap">
+          <button class="step-btn" onclick="stepVal('wt',-0.5)">−</button>
+          <input class="step-val" id="wt" type="number" min="30" max="200" step="0.5" value="70" oninput="clampStep('wt',30,200);markUnsaved()">
+          <span class="step-unit">kg</span>
+          <button class="step-btn" onclick="stepVal('wt',0.5)">+</button>
+        </div>
+        <div class="inp-hint" id="wtHint"></div>
+      </div>
+
+      <!-- TEMPERATUR -->
+      <div class="inp-group">
+        <div class="fl" id="tmpLabel">🌤 Temperatur</div>
+        <div style="margin-top:4px">
+          <input type="range" id="tmpSlider" min="-10" max="45" value="15"
+            oninput="updateTmpLabel();markUnsaved()">
+          <div class="slb">
+            <span>−10°C</span>
+            <span id="tmpVal" style="font-weight:700;color:var(--accent)">15°C</span>
+            <span>45°C</span>
+          </div>
+        </div>
+        <div class="inp-hint" id="tmpHint">Ideale Laufbedingungen.</div>
+      </div>
+
+      <!-- HÖHENMETER -->
+      <div class="inp-group">
+        <div class="fl">⛰ Höhenmeter</div>
+        <div class="step-wrap">
+          <button class="step-btn" onclick="stepVal('elev',-50)">−</button>
+          <input class="step-val" id="elev" type="number" min="0" max="5000" step="50" value="0" oninput="clampStep('elev',0,5000)">
+          <span class="step-unit">m</span>
+          <button class="step-btn" onclick="stepVal('elev',50)">+</button>
+        </div>
+        <div class="inp-hint" id="elevHint">Kein Höhenprofil – flache Strecke.</div>
+      </div>
+
+      <!-- RENNTAG -->
+      <div class="inp-group">
+        <div class="fl">📅 Renntag</div>
+        <input type="date" id="rdate">
+        <div class="inp-hint" id="rdateHint">Für Countdown & Trainingsplan.</div>
+      </div>
+
+      <!-- STARTZEIT -->
+      <div class="inp-group">
+        <div class="fl">🕐 Startzeit</div>
+        <div class="time-wrap">
+          <div class="time-seg">
+            <div class="time-seg-val">
+              <button class="time-arr" onclick="stepStart('h',1)">▲</button>
+              <input class="time-num" id="stH" type="number" min="0" max="23" value="9" oninput="clampStart();markUnsaved()">
+              <button class="time-arr" onclick="stepStart('h',-1)">▼</button>
+            </div>
+            <div class="time-lbl">Stunde</div>
+          </div>
+          <div class="time-colon">:</div>
+          <div class="time-seg">
+            <div class="time-seg-val">
+              <button class="time-arr" onclick="stepStart('m',5)">▲</button>
+              <input class="time-num" id="stM" type="number" min="0" max="59" value="0" oninput="clampStart();markUnsaved()">
+              <button class="time-arr" onclick="stepStart('m',-5)">▼</button>
+            </div>
+            <div class="time-lbl">Minute</div>
+          </div>
+        </div>
+        <div class="inp-hint" id="startHint">Ernährungsplan zeigt echte Uhrzeiten.</div>
+      </div>
+
+    </div><!-- /grid2 -->
 
     <button class="btn-p" onclick="calc()">⚡ PLAN BERECHNEN</button>
   </div>
@@ -630,8 +809,16 @@ function pickRace(el,km,nm){
   if(km==='custom'){cw.style.display='block';R.name='Individuell';}
   else{
     cw.style.display='none'; R.dist=parseFloat(km); R.name=nm;
-    const sg={'5':'0:25','10':'0:52','21.0975':'1:55','42.195':'3:55'};
-    if(sg[km])document.getElementById('ttime').value=sg[km];
+    // Set sensible default times as H/M/S
+    const defaults={'5':[0,25,0],'10':[0,52,0],'21.0975':[1,55,0],'42.195':[3,55,0]};
+    const d=defaults[km];
+    if(d){
+      document.getElementById('ttH').value=d[0];
+      document.getElementById('ttM').value=d[1];
+      document.getElementById('ttS').value=d[2];
+    }
+    previewPace();
+    updateWtHint();
   }
 }
 function stab(el,id){
@@ -656,6 +843,258 @@ function kmAt(racMin) {
 }
 
 // ════════════════════════════════════════════════════════════
+// PROFILE SAVE / LOAD
+// ════════════════════════════════════════════════════════════
+const PROFILE_KEY='rf_profile';
+let _autoSave=false;
+let _autoSaveDebounce=null;
+let _hasUnsaved=false;
+
+function loadProfile(){
+  try{
+    const p=JSON.parse(localStorage.getItem(PROFILE_KEY)||'null');
+    // Load auto-save preference
+    const as=localStorage.getItem('rf_autosave')==='1';
+    _autoSave=as;
+    document.getElementById('autoSaveToggle').checked=as;
+    _updateAutoSaveUI(as);
+
+    if(!p) return;
+    if(p.name) document.getElementById('profileName').value=p.name;
+    if(p.age!=null)  { document.getElementById('age').value=p.age; updateAgeHint(); }
+    if(p.wt!=null)   { document.getElementById('wt').value=p.wt;   updateWtHint();  }
+    if(p.fit)        { document.getElementById('fit').value=p.fit;  updateFitHint(); }
+    if(p.height)     { document.getElementById('heightInput').value=p.height; }
+    if(p.stH!=null)  { document.getElementById('stH').value=p.stH; }
+    if(p.stM!=null)  { document.getElementById('stM').value=p.stM; clampStart(); }
+    if(p.tmp!=null)  { document.getElementById('tmpSlider').value=p.tmp; updateTmpLabel(); }
+    if(p.rdate)      { document.getElementById('rdate').value=p.rdate; }
+    _showSavedState(p);
+  }catch(e){}
+}
+
+function _profileSnapshot(){
+  return {
+    name:   document.getElementById('profileName').value.trim(),
+    age:    document.getElementById('age').value,
+    wt:     document.getElementById('wt').value,
+    fit:    document.getElementById('fit').value,
+    height: document.getElementById('heightInput').value,
+    stH:    document.getElementById('stH').value,
+    stM:    document.getElementById('stM').value,
+    tmp:    document.getElementById('tmpSlider').value,
+    rdate:  document.getElementById('rdate').value,
+    savedAt: Date.now(),
+  };
+}
+
+function saveProfile(){
+  const p=_profileSnapshot();
+  localStorage.setItem(PROFILE_KEY,JSON.stringify(p));
+  _hasUnsaved=false;
+  _showSavedState(p);
+  showToast(p.name ? `✓ ${p.name} gespeichert` : '✓ Profil gespeichert');
+}
+
+function _showSavedState(p){
+  const bar=document.getElementById('profileBar');
+  bar.classList.add('saved');
+  document.getElementById('profileSavedBadge').style.display='inline';
+  document.getElementById('profileUnsavedBadge').style.display='none';
+  const info=document.getElementById('profileSavedInfo');
+  const parts=[];
+  if(p.age)  parts.push(`${p.age} J.`);
+  if(p.wt)   parts.push(`${p.wt} kg`);
+  if(p.fit)  parts.push({beginner:'Einsteiger',intermediate:'Fortgeschritten',advanced:'Ambitioniert',elite:'Elite'}[p.fit]||p.fit);
+  if(p.stH!=null) parts.push(`Start ${String(p.stH).padStart(2,'0')}:${String(p.stM||0).padStart(2,'0')}`);
+  if(p.tmp!=null) parts.push(`${p.tmp}°C`);
+  if(p.savedAt){
+    const d=new Date(p.savedAt);
+    parts.push(`gespeichert ${d.toLocaleDateString('de-DE')} ${d.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'})}`);
+  }
+  info.textContent=parts.join(' · ');
+  info.style.display=parts.length?'block':'none';
+}
+
+function markUnsaved(){
+  if(!_hasUnsaved){
+    _hasUnsaved=true;
+    document.getElementById('profileSavedBadge').style.display='none';
+    document.getElementById('profileUnsavedBadge').style.display='inline';
+    document.getElementById('profileBar').classList.remove('saved');
+  }
+  if(_autoSave){
+    clearTimeout(_autoSaveDebounce);
+    _autoSaveDebounce=setTimeout(()=>{ saveProfile(); }, 800);
+  }
+}
+
+function toggleAutoSave(){
+  _autoSave=document.getElementById('autoSaveToggle').checked;
+  localStorage.setItem('rf_autosave',_autoSave?'1':'0');
+  _updateAutoSaveUI(_autoSave);
+  if(_autoSave && _hasUnsaved) saveProfile();
+  showToast(_autoSave ? '🔄 Auto-Speichern aktiv' : 'Auto-Speichern deaktiviert');
+}
+
+function _updateAutoSaveUI(on){
+  document.getElementById('autoSaveTrack').style.background = on ? 'var(--accent)' : 'var(--border)';
+  document.getElementById('autoSaveThumb').style.transform  = on ? 'translateX(14px)' : 'none';
+  document.getElementById('saveBtn').style.opacity          = on ? '0.4' : '1';
+  document.getElementById('saveBtn').style.pointerEvents    = on ? 'none' : '';
+}
+
+function clearProfile(){
+  if(!confirm('Gespeichertes Profil löschen?')) return;
+  localStorage.removeItem(PROFILE_KEY);
+  _hasUnsaved=false;
+  document.getElementById('profileBar').classList.remove('saved');
+  document.getElementById('profileName').value='';
+  document.getElementById('profileSavedBadge').style.display='none';
+  document.getElementById('profileUnsavedBadge').style.display='none';
+  document.getElementById('profileSavedInfo').style.display='none';
+  showToast('Profil gelöscht');
+}
+
+function showToast(msg){
+  const t=document.getElementById('saveToast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2200);
+}
+
+// ════════════════════════════════════════════════════════════
+// STEPPER HELPERS
+// ════════════════════════════════════════════════════════════
+function stepVal(id,delta){
+  const el=document.getElementById(id);
+  const min=parseFloat(el.min||'-9999'), max=parseFloat(el.max||'9999');
+  const step=Math.abs(delta)>=1?1:0.5;
+  let v=parseFloat(el.value||'0')+delta;
+  v=Math.max(min,Math.min(max,Math.round(v/step)*step));
+  el.value=v;
+  if(id==='age') updateAgeHint();
+  if(id==='wt')  updateWtHint();
+  if(id==='elev') updateElevHint();
+  markUnsaved();
+}
+function clampStep(id,mn,mx){
+  const el=document.getElementById(id);
+  const v=parseFloat(el.value);
+  if(!isNaN(v)) el.value=Math.max(mn,Math.min(mx,v));
+  if(id==='age') updateAgeHint();
+  if(id==='wt')  updateWtHint();
+  if(id==='elev') updateElevHint();
+}
+
+// ════════════════════════════════════════════════════════════
+// TIME STEPPER — Zielzeit
+// ════════════════════════════════════════════════════════════
+function stepTime(part,delta){
+  if(part==='h'){ const el=document.getElementById('ttH'); el.value=Math.max(0,Math.min(9,(parseInt(el.value)||0)+delta)); }
+  if(part==='m'){
+    const el=document.getElementById('ttM');
+    let v=(parseInt(el.value)||0)+delta;
+    if(v<0){ v+=60; const h=document.getElementById('ttH'); h.value=Math.max(0,(parseInt(h.value)||0)-1); }
+    if(v>=60){ v-=60; const h=document.getElementById('ttH'); h.value=Math.min(9,(parseInt(h.value)||0)+1); }
+    el.value=v;
+  }
+  if(part==='s'){
+    const el=document.getElementById('ttS');
+    let v=(parseInt(el.value)||0)+delta;
+    if(v<0){ v+=60; const m=document.getElementById('ttM'); let mv=(parseInt(m.value)||0)-1; if(mv<0){mv+=60;const h=document.getElementById('ttH');h.value=Math.max(0,(parseInt(h.value)||0)-1);} m.value=mv; }
+    if(v>=60){ v-=60; const m=document.getElementById('ttM'); let mv=(parseInt(m.value)||0)+1; if(mv>=60){mv-=60;const h=document.getElementById('ttH');h.value=Math.min(9,(parseInt(h.value)||0)+1);} m.value=mv; }
+    el.value=v;
+  }
+  clampTime(part); previewPace();
+}
+function clampTime(part){
+  if(part==='h'){ const e=document.getElementById('ttH'); e.value=Math.max(0,Math.min(9,parseInt(e.value)||0)); }
+  if(part==='m'){ const e=document.getElementById('ttM'); e.value=Math.max(0,Math.min(59,parseInt(e.value)||0)); }
+  if(part==='s'){ const e=document.getElementById('ttS'); e.value=Math.max(0,Math.min(59,parseInt(e.value)||0)); }
+  previewPace();
+}
+function getTtimeMins(){
+  const h=parseInt(document.getElementById('ttH').value)||0;
+  const m=parseInt(document.getElementById('ttM').value)||0;
+  const s=parseInt(document.getElementById('ttS').value)||0;
+  return h*60+m+s/60;
+}
+function getTtimeStr(){ const t=getTtimeMins(); return Math.floor(t/60)+':'+String(Math.round(t%60)).padStart(2,'0'); }
+
+// ════════════════════════════════════════════════════════════
+// TIME STEPPER — Startzeit
+// ════════════════════════════════════════════════════════════
+function stepStart(part,delta){
+  if(part==='h'){ const el=document.getElementById('stH'); let v=(parseInt(el.value)||0)+delta; if(v<0)v=23; if(v>23)v=0; el.value=v; }
+  if(part==='m'){
+    const el=document.getElementById('stM');
+    let v=(parseInt(el.value)||0)+delta;
+    if(v<0){ v+=60; const h=document.getElementById('stH'); let hv=(parseInt(h.value)||0)-1; h.value=hv<0?23:hv; }
+    if(v>=60){ v-=60; const h=document.getElementById('stH'); let hv=(parseInt(h.value)||0)+1; h.value=hv>23?0:hv; }
+    el.value=v;
+  }
+  clampStart(); markUnsaved();
+}
+function clampStart(){
+  const h=document.getElementById('stH'); h.value=Math.max(0,Math.min(23,parseInt(h.value)||0));
+  const m=document.getElementById('stM'); m.value=Math.max(0,Math.min(59,parseInt(m.value)||0));
+  document.getElementById('startHint').textContent=
+    `Start: ${String(parseInt(h.value)).padStart(2,'0')}:${String(parseInt(m.value)).padStart(2,'0')} Uhr · Alle Zeiten werden live angepasst.`;
+}
+function getStimeStr(){
+  return String(parseInt(document.getElementById('stH').value)||0).padStart(2,'0')+':'+
+         String(parseInt(document.getElementById('stM').value)||0).padStart(2,'0');
+}
+
+// ════════════════════════════════════════════════════════════
+// CONTEXTUAL HINTS
+// ════════════════════════════════════════════════════════════
+function previewPace(){
+  const mins=getTtimeMins();
+  const prev=document.getElementById('pacePreview');
+  if(!mins||!R.dist){ prev.textContent=''; return; }
+  const pace=mins/R.dist;
+  const speed=Math.round(60/pace*10)/10;
+  prev.textContent=`→ ${ps(pace)} min/km · ${speed} km/h`;
+}
+function updateAgeHint(){
+  const a=parseInt(document.getElementById('age').value)||30;
+  const mx=Math.round(207-0.7*a);
+  document.getElementById('ageHint').textContent=`Max HF nach Tanaka: ~${mx} bpm`;
+}
+function updateWtHint(){
+  const w=parseFloat(document.getElementById('wt').value)||70;
+  const kcal=Math.round((R.dist||42.195)*w*1.04);
+  document.getElementById('wtHint').textContent=`Ø Kalorienverbrauch: ~${kcal} kcal`;
+}
+function updateElevHint(){
+  const e=parseInt(document.getElementById('elev').value)||0;
+  if(!e){ document.getElementById('elevHint').textContent='Kein Höhenprofil – flache Strecke.'; return; }
+  const pen=Math.round((e/100)*(8));
+  document.getElementById('elevHint').textContent=`Pace-Penalty: +${pen}s/km durch Anstiege`;
+}
+function updateFitHint(){
+  const hints={
+    beginner:'Gleichmäßige Pace, kein Risiko eingehen.',
+    intermediate:'Normales Wettkampftempo mit leichtem Negativsplit.',
+    advanced:'Aggressive Paceverteilung, Reserven bis km 30+ halten.',
+    elite:'Maximale Paceeffizienz, Last 10% alles geben.'
+  };
+  document.getElementById('fitHint').textContent=hints[document.getElementById('fit').value]||'';
+}
+function updateTmpLabel(){
+  const v=parseInt(document.getElementById('tmpSlider').value);
+  document.getElementById('tmpVal').textContent=v+'°C';
+  const hints=v<0?'🥶 Extrem kalt – Aufwärmen & Schichten wichtig.':
+    v<8?'🧊 Kalt – Handschuhe empfohlen.':
+    v<16?'👍 Optimal für Ausdauerleistung.':
+    v<22?'🌤 Angenehm warm.':
+    v<28?'☀️ Warm – mehr trinken, Pace etwas lockern.':
+    '🔥 Heiß – Pace 5–10% reduzieren, Kühlung suchen.';
+  document.getElementById('tmpHint').textContent=hints;
+}
+
+// ════════════════════════════════════════════════════════════
 // CALCULATE
 // ════════════════════════════════════════════════════════════
 function calc(){
@@ -669,11 +1108,11 @@ function calc(){
   R.tmp  =parseInt(document.getElementById('tmpSlider').value);
   R.elev =parseInt(document.getElementById('elev').value)||0;
   R.rdate=document.getElementById('rdate').value||null;
-  R.stime=document.getElementById('stime').value||'09:00';
+  R.stime=getStimeStr();
 
-  const tStr=document.getElementById('ttime').value;
   const defPace={beginner:8,intermediate:6,advanced:5,elite:3.8}[R.fit];
-  R.min=parseMins(tStr)||R.dist*defPace;
+  const userMins=getTtimeMins();
+  R.min=userMins>0?userMins:R.dist*defPace;
 
   // Elevation penalty: ~8s/km per 100m gain
   const elevPen=(R.elev/100)*(8/60);
@@ -1602,13 +2041,40 @@ function reset(){if(cdTmr)clearInterval(cdTmr);document.getElementById('results'
 // ════════════════════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded',()=>{
   R.dist=5;
-  document.getElementById('ttime').value='0:25';
+  // Init default time (5km = 0:25:00)
+  document.getElementById('ttH').value=0;
+  document.getElementById('ttM').value=25;
+  document.getElementById('ttS').value=0;
+  // Load saved profile first
+  loadProfile();
+  // Init all hints
+  previewPace();
+  updateAgeHint();
+  updateWtHint();
+  updateElevHint();
+  updateFitHint();
+  updateTmpLabel();
+  clampStart();
+  // Temp slider
   document.getElementById('tmpSlider').dispatchEvent(new Event('input'));
+  // PR + checklist
   buildPRTable();
   buildChecklist();
   // Pre-fill liveTime with current time
   const now=new Date();
   document.getElementById('liveTime').value=String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
+  // Fit dropdown hint on change
+  document.getElementById('fit').addEventListener('change',updateFitHint);
+  document.getElementById('age').addEventListener('input',updateAgeHint);
+  document.getElementById('wt').addEventListener('input',updateWtHint);
+  document.getElementById('elev').addEventListener('input',updateElevHint);
+  document.getElementById('rdate').addEventListener('change',()=>{
+    const d=document.getElementById('rdate').value;
+    if(d){
+      const diff=Math.ceil((new Date(d)-Date.now())/86400000);
+      document.getElementById('rdateHint').textContent=diff>0?`In ${diff} Tagen · Countdown & Trainingsplan aktiv.`:'Renntag ist heute oder vergangen!';
+    }
+  });
 });
 </script>
 </body>
