@@ -240,7 +240,73 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 .cad-meter{height:8px;border-radius:4px;margin-top:8px;background:var(--border);overflow:hidden}
 .cad-fill {height:100%;border-radius:4px}
 
-@media(max-width:600px){.days-row{grid-template-columns:repeat(7,1fr)}.day-cell{padding:4px 2px}}
+/* ─── IPHONE PREVIEW ─────────────────────────────────────── */
+.iphone-btn{position:fixed;top:64px;right:14px;z-index:200;width:42px;height:42px;border-radius:50%;background:var(--card);border:1px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:var(--shadow);transition:transform .2s,background var(--t),border-color var(--t)}
+.iphone-btn:hover{transform:scale(1.12)}
+.iphone-btn.active{background:var(--accent);border-color:var(--accent);color:#000}
+
+/* Phone-mode overlay */
+.phone-mode-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:300;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);align-items:flex-start;justify-content:center;padding:20px 0;overflow-y:auto}
+.phone-mode-backdrop.show{display:flex}
+.iphone-shell{
+  position:relative;width:393px;flex-shrink:0;
+  background:#1a1a1a;
+  border-radius:54px;
+  padding:14px;
+  box-shadow:0 0 0 2px #3a3a3a,0 30px 80px rgba(0,0,0,.8),inset 0 0 0 1px rgba(255,255,255,.08);
+}
+/* Dynamic Island */
+.iphone-island{width:120px;height:34px;background:#000;border-radius:20px;margin:0 auto 10px;position:relative;z-index:2}
+/* Side buttons */
+.iphone-shell::before{content:'';position:absolute;left:-3px;top:120px;width:3px;height:36px;background:#3a3a3a;border-radius:2px 0 0 2px;box-shadow:0 44px 0 #3a3a3a,0 88px 0 #3a3a3a}
+.iphone-shell::after{content:'';position:absolute;right:-3px;top:150px;width:3px;height:70px;background:#3a3a3a;border-radius:0 2px 2px 0}
+.iphone-screen{
+  border-radius:42px;overflow:hidden;background:var(--bg);
+  height:780px;overflow-y:auto;position:relative;
+  scrollbar-width:thin;scrollbar-color:var(--border) transparent;
+}
+.iphone-screen::-webkit-scrollbar{width:3px}
+.iphone-screen::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+/* Status bar */
+.iphone-status{display:flex;justify-content:space-between;align-items:center;padding:8px 24px 4px;font-size:12px;font-weight:700;font-family:'DM Sans',sans-serif;position:sticky;top:0;z-index:10;background:var(--bg)}
+.iphone-status-time{color:var(--text)}
+.iphone-status-icons{display:flex;gap:5px;align-items:center;color:var(--text)}
+.iphone-content{padding:0 4px 20px}
+/* Home indicator */
+.iphone-home{width:120px;height:5px;background:#fff;opacity:.3;border-radius:3px;margin:10px auto 0}
+/* Close button */
+.iphone-close{position:absolute;top:16px;right:20px;z-index:10;background:rgba(0,0,0,.5);border:none;color:#fff;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center}
+.iphone-close:hover{background:rgba(255,87,51,.7)}
+/* Escape hint */
+.iphone-hint{text-align:center;color:rgba(255,255,255,.4);font-size:12px;margin-top:10px;padding-bottom:20px}
+
+/* ─── CHECKLIST EDIT MODE ────────────────────────────────── */
+.cl-edit-row{display:flex;gap:6px;margin-top:6px}
+.cl-edit-row input{flex:1;background:var(--surface);border:1px dashed var(--border);border-radius:8px;padding:7px 12px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;outline:none}
+.cl-edit-row input:focus{border-color:var(--accent);border-style:solid}
+.cl-edit-row .btn-g{padding:6px 12px;font-size:12px;border-radius:8px;white-space:nowrap}
+.cl-item .cl-del{background:none;border:none;color:var(--muted);cursor:pointer;padding:2px 6px;border-radius:4px;font-size:14px;margin-left:auto;flex-shrink:0;display:none;transition:color .15s}
+.cl-item .cl-del:hover{color:var(--red)}
+.cl-editing .cl-item .cl-del{display:block}
+.cl-editing .cl-item{cursor:default}
+.cl-cat-hdr{display:flex;align-items:center;gap:8px}
+.cl-cat-del{background:none;border:none;color:var(--muted);cursor:pointer;font-size:13px;display:none;padding:2px 5px;border-radius:4px;transition:color .15s}
+.cl-cat-del:hover{color:var(--red)}
+.cl-editing .cl-cat-del{display:block}
+.cl-add-cat{display:flex;gap:8px;margin-top:16px;padding-top:12px;border-top:1px dashed var(--border)}
+.cl-edit-toggle{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+
+@media(max-width:600px){
+  .logo{font-size:52px}
+  .srow{grid-template-columns:repeat(2,1fr)}
+  .tab{font-size:11px;padding:8px 3px;min-width:60px}
+  .cdrow{gap:5px}
+  .cdn{font-size:34px}
+  .days-row{grid-template-columns:repeat(7,1fr)}
+  .day-cell{padding:4px 2px}
+  .iphone-shell{width:100%;max-width:393px}
+}
+
 
 
 /* ─── PRINT ──────────────────────────────────────────────── */
@@ -251,6 +317,29 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 <body>
 
 <button class="thm-btn" id="thmBtn" onclick="toggleTheme()">🌙</button>
+<button class="iphone-btn" id="iphoneBtn" onclick="toggleIphone()" title="iPhone-Ansicht">📱</button>
+
+<!-- IPHONE MODAL -->
+<div class="phone-mode-backdrop" id="phoneBackdrop" onclick="closeIphoneIfOutside(event)">
+  <div>
+    <div class="iphone-shell" id="iphoneShell">
+      <div class="iphone-island"></div>
+      <div class="iphone-screen" id="iphoneScreen">
+        <div class="iphone-status">
+          <span class="iphone-status-time" id="iphoneTime">9:41</span>
+          <div class="iphone-status-icons">
+            <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor"><rect x="0" y="3" width="3" height="9" rx="1"/><rect x="4" y="2" width="3" height="10" rx="1"/><rect x="8" y="0" width="3" height="12" rx="1"/><rect x="12" y="0" width="4" height="12" rx="1" opacity=".3"/></svg>
+            <svg width="16" height="12" viewBox="0 0 24 12" fill="currentColor"><rect x="0" y="3" width="20" height="9" rx="2" stroke="currentColor" stroke-width="1.5" fill="none"/><rect x="1.5" y="4.5" width="14" height="6" rx="1" fill="currentColor"/><rect x="21" y="5" width="3" height="5" rx="1" fill="currentColor" opacity=".5"/></svg>
+          </div>
+        </div>
+        <div class="iphone-content" id="iphoneContent"></div>
+      </div>
+      <div class="iphone-home"></div>
+      <button class="iphone-close" onclick="toggleIphone()">✕</button>
+    </div>
+    <div class="iphone-hint">Tap außerhalb oder ✕ zum Schließen · Scrollen im Gerät möglich</div>
+  </div>
+</div>
 
 <div class="wrap">
 
@@ -433,11 +522,17 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
     <div id="tk" style="display:none">
       <div class="card">
         <div class="lbl">🎒 Race-Day Checkliste</div>
-        <p class="sm mt8">Interaktive Checkliste — Fortschritt wird automatisch gespeichert.</p>
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;margin-top:8px">
+          <p class="sm">Interaktiv abhaken · Fortschritt gespeichert · Vollständig anpassbar.</p>
+          <div class="cl-edit-toggle">
+            <button class="btn-g btn-gs" id="clEditBtn" onclick="toggleClEdit()">✏️ Bearbeiten</button>
+            <button class="btn-g btn-gs" onclick="resetClChecks()">↺ Häkchen reset</button>
+            <button class="btn-g btn-gs" onclick="resetClItems()" style="color:var(--muted)">🗑 Standard</button>
+          </div>
+        </div>
         <div class="cl-prog mt14">
           <div class="cl-prog-bar"><div class="cl-prog-fill" id="clProgFill" style="width:0%"></div></div>
           <span class="sm" id="clProgTxt">0 / 0 erledigt</span>
-          <button class="btn-g btn-gs" onclick="resetChecklist()">↺ Reset</button>
         </div>
         <div id="checklistBox"></div>
       </div>
@@ -613,7 +708,11 @@ function calc(){
   buildTips();
 
   document.getElementById('results').style.display='block';
-  setTimeout(()=>{document.getElementById('results').scrollIntoView({behavior:'smooth',block:'start'});animTrack();},100);
+  setTimeout(()=>{
+    document.getElementById('results').scrollIntoView({behavior:'smooth',block:'start'});
+    animTrack();
+    if(iphoneOpen) renderIphoneContent();
+  },100);
 }
 
 // ════════════════════════════════════════════════════════════
@@ -1180,14 +1279,14 @@ function buildTraining(){
 }
 
 // ════════════════════════════════════════════════════════════
-// RACE-DAY CHECKLIST
+// RACE-DAY CHECKLIST — fully editable
 // ════════════════════════════════════════════════════════════
-const CHECKLIST=[
+const CL_DEFAULT=[
   {cat:'📅 Vorabend',items:[
     'Startnummer + Sicherheitsnadeln bereitgelegt',
-    'Schuhe & Laufsocken ausgewählt und bereit',
+    'Schuhe & Laufsocken ausgewählt',
     'Rennoutfit (getestetes!) bereitgelegt',
-    'Gels & Verpflegung vorbereitet und eingepackt',
+    'Gels & Verpflegung eingepackt',
     'GPS-Uhr geladen (mind. 90% Akku)',
     'Trinkflasche / Trinkgürtel bereit',
     'Wecker gestellt (mind. 3h vor Start)',
@@ -1198,19 +1297,19 @@ const CHECKLIST=[
   ]},
   {cat:'🌅 Renntag Morgen',items:[
     'Leichtes Frühstück: Banane, Toast, Haferflocken',
-    `300–500 ml Wasser getrunken`,
+    '300–500 ml Wasser getrunken',
     'Startnummer befestigt',
     'Körper eingecremt (Nippel, Oberschenkel)',
     'GPS-Uhr eingeschaltet + Satelliten suchen',
     'Wetter gecheckt → Tempo ggf. angepasst',
-    `Warm-Up (${R.dist<=10?'10–15 min Einlaufen':'5–10 min Gehen/Traben'})`,
+    'Warm-Up (10–15 min Einlaufen)',
     'Letztes Gel / Iso 15 min vor Start',
     'Startblock korrekt eingeteilt',
   ]},
   {cat:'🏁 Im Rennen',items:[
-    `Phase 1 (0–${(R.dist/3).toFixed(0)}km): ruhig beginnen, Pace kontrollieren`,
+    'Phase 1: ruhig beginnen, Pace kontrollieren',
     'Regelmäßig trinken (alle 15–20 min)',
-    `Erstes Gel nach ${R.dist>=10?'30–45 min':'Ende nicht nötig'}`,
+    'Gels zum geplanten Zeitpunkt nehmen',
     'Elektrolyte bei Bedarf nehmen',
     'Negative Split: 2. Hälfte schneller',
     'Letztes km: alles geben',
@@ -1219,55 +1318,274 @@ const CHECKLIST=[
     'Sofort 300–500 ml Wasser trinken',
     'Innerhalb 30 min: Banane oder Protein-Shake',
     'Medaille / Ergebnis fotografieren 📸',
-    `Ergebnis im PR-Tracker eintragen`,
+    'Ergebnis im PR-Tracker eintragen',
     'Beine hochlegen, kühlen',
     'Vollständige Mahlzeit innerhalb 2h',
   ]},
 ];
 
+let clEditMode=false;
+
 function getChecks(){ try{return JSON.parse(localStorage.getItem('rf_checks')||'{}')}catch{return{}} }
 function saveChecks(o){ localStorage.setItem('rf_checks',JSON.stringify(o)) }
+function getClItems(){ try{const d=localStorage.getItem('rf_cl_items'); return d?JSON.parse(d):JSON.parse(JSON.stringify(CL_DEFAULT))}catch{return JSON.parse(JSON.stringify(CL_DEFAULT))} }
+function saveClItems(a){ localStorage.setItem('rf_cl_items',JSON.stringify(a)) }
+
+function toggleClEdit(){
+  clEditMode=!clEditMode;
+  const btn=document.getElementById('clEditBtn');
+  btn.textContent=clEditMode?'✅ Fertig':'✏️ Bearbeiten';
+  btn.style.borderColor=clEditMode?'var(--accent)':'';
+  btn.style.color=clEditMode?'var(--accent)':'';
+  buildChecklist();
+}
 
 function buildChecklist(){
   const checks=getChecks();
+  const items=getClItems();
   const box=document.getElementById('checklistBox'); if(!box)return;
   let total=0,done=0,html='';
-  CHECKLIST.forEach(sec=>{
-    html+=`<div class="cl-section"><div class="cl-title">${sec.cat}</div>`;
+
+  if(clEditMode) html+='<div class="cl-editing" id="clEditWrap">';
+
+  items.forEach((sec,si)=>{
+    const escapedCat=sec.cat.replace(/'/g,"\\'");
+    html+=`<div class="cl-section" data-si="${si}">
+      <div class="cl-cat-hdr">
+        <div class="cl-title" style="flex:1">${sec.cat}</div>
+        <button class="cl-cat-del" onclick="deleteCat(${si})" title="Kategorie löschen">✕ Kategorie</button>
+      </div>`;
+
     sec.items.forEach((item,ii)=>{
-      const key=`${sec.cat}__${ii}`;
-      const isDone=!!checks[key];
+      const key=`${si}__${ii}`;
+      const isDone=!clEditMode && !!checks[key];
       total++; if(isDone)done++;
-      html+=`<div class="cl-item${isDone?' done':''}" onclick="toggleCheck('${key}',this)">
+      const safeItem=item.replace(/'/g,"\\'").replace(/"/g,'&quot;');
+      html+=`<div class="cl-item${isDone?' done':''}" ${clEditMode?'':'onclick="toggleCheck(\''+key+'\',this)"'} data-key="${key}">
         <div class="cl-chk">${isDone?'✓':''}</div>
-        <div class="cl-text">${item}</div>
+        ${clEditMode
+          ? `<input type="text" value="${safeItem}" style="flex:1;background:transparent;border:none;border-bottom:1px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;outline:none;padding:2px 4px" onchange="editItem(${si},${ii},this.value)" onfocus="this.style.borderBottomColor='var(--accent)'" onblur="this.style.borderBottomColor='var(--border)'">`
+          : `<div class="cl-text">${item}</div>`
+        }
+        <button class="cl-del" onclick="deleteItem(${si},${ii})">✕</button>
       </div>`;
     });
+
+    if(clEditMode){
+      html+=`<div class="cl-edit-row">
+        <input type="text" id="newItem_${si}" placeholder="+ Neuer Punkt eingeben…" onkeydown="if(event.key==='Enter')addItem(${si})">
+        <button class="btn-g" onclick="addItem(${si})">+ Add</button>
+      </div>`;
+    }
     html+='</div>';
   });
+
+  if(clEditMode){
+    html+=`<div class="cl-add-cat">
+      <input type="text" id="newCatInput" placeholder="📁 Neue Kategorie, z.B. 🎵 Musik Setup" style="flex:1">
+      <button class="btn-g" onclick="addCat()">+ Kategorie</button>
+    </div></div>`;
+  }
+
   box.innerHTML=html;
-  const pct=total>0?Math.round(done/total*100):0;
-  document.getElementById('clProgFill').style.width=pct+'%';
-  document.getElementById('clProgTxt').textContent=`${done} / ${total} erledigt`;
+  if(!clEditMode){
+    const pct=total>0?Math.round(done/total*100):0;
+    document.getElementById('clProgFill').style.width=pct+'%';
+    document.getElementById('clProgTxt').textContent=`${done} / ${total} erledigt`;
+  } else {
+    document.getElementById('clProgFill').style.width='0%';
+    document.getElementById('clProgTxt').textContent='Bearbeitungsmodus';
+  }
 }
 
 function toggleCheck(key,el){
+  if(clEditMode)return;
   const checks=getChecks();
   if(checks[key]) delete checks[key]; else checks[key]=1;
   saveChecks(checks);
   const isDone=!!checks[key];
   el.classList.toggle('done',isDone);
   el.querySelector('.cl-chk').textContent=isDone?'✓':'';
-  // Update progress
-  const all=document.querySelectorAll('.cl-item'), doneCount=document.querySelectorAll('.cl-item.done').length;
-  const pct=all.length>0?Math.round(doneCount/all.length*100):0;
+  const all=document.querySelectorAll('.cl-item'), doneC=document.querySelectorAll('.cl-item.done').length;
+  const pct=all.length>0?Math.round(doneC/all.length*100):0;
   document.getElementById('clProgFill').style.width=pct+'%';
-  document.getElementById('clProgTxt').textContent=`${doneCount} / ${all.length} erledigt`;
+  document.getElementById('clProgTxt').textContent=`${doneC} / ${all.length} erledigt`;
 }
 
-function resetChecklist(){
-  if(!confirm('Alle Häkchen zurücksetzen?'))return;
-  saveChecks({}); buildChecklist();
+function editItem(si,ii,val){
+  const items=getClItems();
+  if(items[si]&&items[si].items[ii]!==undefined){ items[si].items[ii]=val; saveClItems(items); }
+}
+function deleteItem(si,ii){
+  const items=getClItems();
+  if(items[si]){items[si].items.splice(ii,1); saveClItems(items); buildChecklist();}
+}
+function addItem(si){
+  const inp=document.getElementById('newItem_'+si); if(!inp||!inp.value.trim())return;
+  const items=getClItems();
+  if(items[si]){items[si].items.push(inp.value.trim()); saveClItems(items); buildChecklist();}
+}
+function deleteCat(si){
+  if(!confirm('Kategorie löschen?'))return;
+  const items=getClItems(); items.splice(si,1); saveClItems(items); buildChecklist();
+}
+function addCat(){
+  const inp=document.getElementById('newCatInput'); if(!inp||!inp.value.trim())return;
+  const items=getClItems(); items.push({cat:inp.value.trim(),items:[]}); saveClItems(items); buildChecklist();
+}
+function resetClChecks(){ if(!confirm('Alle Häkchen zurücksetzen?'))return; saveChecks({}); buildChecklist(); }
+function resetClItems(){ if(!confirm('Checkliste auf Standard zurücksetzen? Eigene Einträge gehen verloren.'))return; localStorage.removeItem('rf_cl_items'); saveChecks({}); buildChecklist(); }
+
+// Legacy alias
+function resetChecklist(){ resetClChecks(); }
+
+// ════════════════════════════════════════════════════════════
+// IPHONE PREVIEW
+// ════════════════════════════════════════════════════════════
+let iphoneOpen=false;
+let iphoneClockTimer=null;
+
+function toggleIphone(){
+  iphoneOpen=!iphoneOpen;
+  const backdrop=document.getElementById('phoneBackdrop');
+  const btn=document.getElementById('iphoneBtn');
+  backdrop.classList.toggle('show',iphoneOpen);
+  btn.classList.toggle('active',iphoneOpen);
+  document.body.style.overflow=iphoneOpen?'hidden':'';
+
+  if(iphoneOpen){
+    renderIphoneContent();
+    startIphoneClock();
+  } else {
+    if(iphoneClockTimer){clearInterval(iphoneClockTimer);iphoneClockTimer=null;}
+  }
+}
+
+function closeIphoneIfOutside(e){
+  if(e.target===document.getElementById('phoneBackdrop')) toggleIphone();
+}
+
+function startIphoneClock(){
+  function setTime(){
+    const now=new Date();
+    document.getElementById('iphoneTime').textContent=
+      String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
+  }
+  setTime();
+  iphoneClockTimer=setInterval(setTime,10000);
+}
+
+function renderIphoneContent(){
+  const screen=document.getElementById('iphoneContent');
+  const isDark=document.documentElement.getAttribute('data-theme')==='dark';
+
+  // Build a compact mobile-optimized summary of the current plan
+  if(!R.min||!R.dist||document.getElementById('results').style.display==='none'){
+    screen.innerHTML=`
+      <div style="padding:20px 16px;text-align:center">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:42px;letter-spacing:3px;background:linear-gradient(135deg,#00c97a,#3b9eff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">RACEFLOW</div>
+        <p style="color:var(--muted);font-size:12px;letter-spacing:2px;text-transform:uppercase;margin-top:4px">Race Planner</p>
+        <div style="margin-top:40px;padding:20px;background:var(--surface);border-radius:16px;border:1px solid var(--border)">
+          <div style="font-size:32px;margin-bottom:12px">🏃</div>
+          <p style="color:var(--muted);font-size:13px;line-height:1.6">Berechne zuerst deinen Rennplan im Hauptfenster, dann erscheint hier deine mobile Ansicht.</p>
+        </div>
+      </div>`;
+    return;
+  }
+
+  const effPace=R.min/R.dist;
+  const zones=getZones(effPace);
+
+  // Nutrition events for today view
+  const nutriItems=[];
+  const gels=R.dist>=10?Math.max(0,Math.floor((R.min-30)/45)):0;
+  nutriItems.push({m:-60,icon:'🍳',label:'Mahlzeit',time:clockAt(-60)});
+  nutriItems.push({m:-15,icon:'💧',label:'Hydrierung',time:clockAt(-15)});
+  nutriItems.push({m:0,  icon:'🏁',label:'START',    time:clockAt(0)});
+  const wI=R.tmp>20?15:20;
+  let ti=0,gc=0,gI=gels>0?Math.floor(R.min/(gels+1)):0;
+  while(ti<R.min-5){
+    ti+=5;
+    if(ti%wI<5) nutriItems.push({m:ti,icon:'💧',label:'Trinken',time:clockAt(ti)});
+    if(gI&&ti%gI<5&&ti>25&&gc<gels){gc++;nutriItems.push({m:ti,icon:'⚡',label:`Gel #${gc}`,time:clockAt(ti)});}
+  }
+  nutriItems.push({m:R.min,icon:'🎯',label:'ZIEL',time:clockAt(R.min)});
+
+  const seen=new Set();
+  const uniqueItems=nutriItems.filter(it=>{const k=it.m+'_'+it.icon;if(seen.has(k))return false;seen.add(k);return true;});
+
+  screen.innerHTML=`
+    <!-- Header -->
+    <div style="padding:0 16px 14px">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:3px;background:linear-gradient(135deg,#00c97a,#3b9eff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-align:center">RACEFLOW</div>
+    </div>
+
+    <!-- Key stats 2x3 -->
+    <div style="padding:0 12px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+      ${[
+        ['📏',R.dist%1===0?R.dist:R.dist.toFixed(1),'km'],
+        ['⏱️',Math.floor(R.min/60)+':'+String(Math.round(R.min%60)).padStart(2,'0'),'Zielzeit'],
+        ['⚡',ps(effPace),'/km'],
+        ['🔥',Math.round(R.dist*R.wt*1.04),'kcal'],
+        ['🏁',clockAt(0),'Start'],
+        ['🎯',clockAt(R.min),'Ziel'],
+      ].map(([ic,v,u])=>`
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:10px 6px;text-align:center">
+          <div style="font-size:16px">${ic}</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;color:var(--accent);line-height:1.2;margin-top:3px">${v}</div>
+          <div style="font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-top:2px">${u}</div>
+        </div>`).join('')}
+    </div>
+
+    <!-- Pace zones -->
+    <div style="padding:14px 12px 0">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:3px;color:#00c97a;margin-bottom:8px">PACE STRATEGIE</div>
+      ${zones.map((z,zi)=>{
+        const cs=['rgba(0,229,160,.15)','rgba(255,184,0,.15)','rgba(255,87,51,.15)'];
+        const bc=['rgba(0,229,160,.4)','rgba(255,184,0,.4)','rgba(255,87,51,.4)'];
+        return `<div style="background:${cs[zi]};border:1px solid ${bc[zi]};border-radius:10px;padding:10px 12px;margin-bottom:7px;display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div style="font-size:11px;font-weight:700;letter-spacing:1px">${z.nm.split('—')[1]?.trim()||z.nm}</div>
+            <div style="font-size:10px;color:var(--muted);margin-top:2px">${z.km}</div>
+          </div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700">${ps(z.pace)}</div>
+        </div>`;
+      }).join('')}
+    </div>
+
+    <!-- Nutrition timeline -->
+    <div style="padding:14px 12px 0">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:3px;color:#00c97a;margin-bottom:10px">ERNÄHRUNGSPLAN</div>
+      <div style="position:relative;padding-left:20px">
+        <div style="position:absolute;left:6px;top:4px;bottom:4px;width:2px;background:linear-gradient(180deg,#00c97a,#3b9eff,#ff5733)"></div>
+        ${uniqueItems.map(it=>`
+          <div style="position:relative;margin-bottom:10px">
+            <div style="position:absolute;left:-18px;top:4px;width:10px;height:10px;border-radius:50%;background:var(--bg);border:2px solid #00c97a"></div>
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 10px;display:flex;align-items:center;gap:8px">
+              <span style="font-size:16px">${it.icon}</span>
+              <div style="flex:1">
+                <div style="font-size:12px;font-weight:700">${it.label}</div>
+              </div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#00c97a;font-weight:700">${it.time}</div>
+            </div>
+          </div>`).join('')}
+      </div>
+    </div>
+
+    <!-- Tips row -->
+    <div style="padding:14px 12px 8px">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:3px;color:#00c97a;margin-bottom:8px">QUICK-TIPPS</div>
+      ${[
+        ['💧',`Alle ${R.tmp>20?'15':'20'} min trinken`],
+        ['🌡️',`${R.tmp}°C – ${R.tmp>22?'Pace anpassen!':'Gute Bedingungen'}`],
+        [R.elev>0?'⛰️':'🏃',R.elev>0?`+${R.elev}m Höhenmeter beachten`:'Gleichmäßiges Tempo'],
+        ['🧠','Mentale Segmente nutzen'],
+      ].map(([ic,t])=>`
+        <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--surface);border:1px solid var(--border);border-radius:8px;margin-bottom:6px">
+          <span style="font-size:18px">${ic}</span>
+          <span style="font-size:12px;color:var(--muted)">${t}</span>
+        </div>`).join('')}
+    </div>`;
 }
 
 // ════════════════════════════════════════════════════════════
